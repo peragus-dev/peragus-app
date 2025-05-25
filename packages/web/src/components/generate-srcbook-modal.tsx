@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Button } from '@srcbook/components/src/components/ui/button';
-import { Textarea } from '@srcbook/components/src/components/ui/textarea';
+import { Button } from '@peragus/components/src/components/ui/button';
+import { Textarea } from '@peragus/components/src/components/ui/textarea';
 import { Sparkles, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@srcbook/components/src/components/ui/dialog';
+} from '@peragus/components/src/components/ui/dialog';
 import { generateSrcbook } from '@/lib/server';
 import { useSettings } from '@/components/use-settings';
 

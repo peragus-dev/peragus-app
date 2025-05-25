@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import { OutputType } from '@srcbook/components/src/types';
+import { OutputType } from '@peragus/components/src/types';
 import { Loader2 } from 'lucide-react';
 import { useDebounce } from 'use-debounce';
 import { cn } from '@/lib/utils';
 import { searchNpmPackages } from '@/lib/server';
-import { Input } from '@srcbook/components/src/components/ui/input';
+import { Input } from '@peragus/components/src/components/ui/input';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@srcbook/components/src/components/ui/dialog';
+} from '@peragus/components/src/components/ui/dialog';
 
 type NPMPackageType = {
   name: string;

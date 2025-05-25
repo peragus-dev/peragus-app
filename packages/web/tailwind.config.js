@@ -12,7 +12,7 @@ export default {
   content: [
     './index.html',
     './src/**/*.{css,ts,tsx}',
-    path.join(path.dirname(require.resolve('@srcbook/components')), '**/*.{css,js,ts,tsx}'),
+    path.join(path.dirname(require.resolve('@peragus/components')), '**/*.{css,js,ts,tsx}'),
   ],
   prefix: '',
   theme: {

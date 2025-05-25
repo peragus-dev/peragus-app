@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@srcbook/components/src/components/ui/dialog';
+} from '@peragus/components/src/components/ui/dialog';
 
 export default function AiGenerateTipsDialog({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);

@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { type CodeCellType, type MarkdownCellType } from '@srcbook/shared';
+import { type CodeCellType, type MarkdownCellType } from '@peragus/shared';
 import { generateCells } from '@/lib/server';
 import { CircleAlert, Trash2, Sparkles } from 'lucide-react';
 import { SessionType } from '@/types';
-import { GenerateAICellType } from '@srcbook/components/src/types';
-import { useCells } from '@srcbook/components/src/components/use-cell';
+import { GenerateAICellType } from '@peragus/components/src/types';
+import { useCells } from '@peragus/components/src/components/use-cell';
 import { cn } from '@/lib/utils';
-import { Button } from '@srcbook/components/src/components/ui/button';
+import { Button } from '@peragus/components/src/components/ui/button';
 import { useSettings } from '@/components/use-settings';
 
 export default function GenerateAiCell(props: {

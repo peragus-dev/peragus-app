@@ -2,7 +2,7 @@
 
 import z from 'zod';
 import WebSocketClient from '@/clients/websocket/client';
-import { randomid } from '@srcbook/shared';
+import { randomid } from '@peragus/shared';
 
 export default class Channel<
   I extends Record<string, z.ZodSchema<any>>,

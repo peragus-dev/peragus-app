@@ -41,7 +41,7 @@ import {
   DepsStatusResponsePayloadSchema,
   DepsStatusPayloadSchema,
   PreviewLogPayloadSchema,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import Channel from '@/clients/websocket/channel';
 import WebSocketClient from '@/clients/websocket/client';
 import SRCBOOK_CONFIG from '@/config';

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { CircleCheck, Loader2, CircleX, RefreshCw } from 'lucide-react';
 import { aiHealthcheck, subscribeToMailingList } from '@/lib/server';
 import { useSettings, type OpenRouterModel } from '@/components/use-settings';
-import { AiProviderType, getDefaultModel, type CodeLanguageType } from '@srcbook/shared';
+import { AiProviderType, getDefaultModel, type CodeLanguageType } from '@peragus/shared';
 import {
   Select,
   SelectContent,
@@ -11,17 +11,17 @@ import {
   SelectValue,
   SelectGroup,
   SelectLabel,
-} from '@srcbook/components/src/components/ui/select';
-import { Input } from '@srcbook/components/src/components/ui/input';
-import useTheme from '@srcbook/components/src/components/use-theme';
-import { Switch } from '@srcbook/components/src/components/ui/switch';
-import { Button } from '@srcbook/components/src/components/ui/button';
+} from '@peragus/components/src/components/ui/select';
+import { Input } from '@peragus/components/src/components/ui/input';
+import useTheme from '@peragus/components/src/components/use-theme';
+import { Switch } from '@peragus/components/src/components/ui/switch';
+import { Button } from '@peragus/components/src/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@srcbook/components/src/components/ui/tooltip';
+} from '@peragus/components/src/components/ui/tooltip';
 import { toast } from 'sonner';
 
 function Settings() {

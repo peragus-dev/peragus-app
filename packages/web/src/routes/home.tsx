@@ -1,5 +1,5 @@
 import { useNavigate, useLoaderData } from 'react-router-dom';
-import { CodeLanguageType, TitleCellType } from '@srcbook/shared';
+import { CodeLanguageType, TitleCellType } from '@peragus/shared';
 import {
   getConfig,
   createSession,
@@ -21,7 +21,7 @@ import {
 } from '@/components/srcbook-cards';
 import DeleteSrcbookModal from '@/components/delete-srcbook-dialog';
 import { ExternalLink } from 'lucide-react';
-import { Button } from '@srcbook/components/src/components/ui/button';
+import { Button } from '@peragus/components/src/components/ui/button';
 import MailingListCard from '@/components/mailing-list-card';
 import Onboarding from '@/components/onboarding';
 import { useSettings } from '@/components/use-settings';

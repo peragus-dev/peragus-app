@@ -9,8 +9,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@srcbook/components/src/components/ui/dialog';
-import { Button } from '@srcbook/components/src/components/ui/button';
+} from '@peragus/components/src/components/ui/dialog';
+import { Button } from '@peragus/components/src/components/ui/button';
 
 export default function DeleteSrcbookModal({
   open,

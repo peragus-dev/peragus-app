@@ -2,11 +2,11 @@ import { useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { cn, isValidSecretName } from '@/lib/utils.ts';
 import { getSecrets } from '@/lib/server';
-import { type SecretWithAssociatedSessions } from '@srcbook/shared';
+import { type SecretWithAssociatedSessions } from '@peragus/shared';
 import { Info, Trash2, Eye, EyeOff } from 'lucide-react';
 import { Form, useLoaderData, useRevalidator } from 'react-router-dom';
-import { Input } from '@srcbook/components/src/components/ui/input';
-import { Button } from '@srcbook/components/src/components/ui/button';
+import { Input } from '@peragus/components/src/components/ui/input';
+import { Button } from '@peragus/components/src/components/ui/button';
 import { updateSecret, createSecret, deleteSecret } from '@/lib/server';
 import {
   Dialog,
@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@srcbook/components/src/components/ui/dialog';
+} from '@peragus/components/src/components/ui/dialog';
 
 async function loader() {
   const { result } = await getSecrets();
