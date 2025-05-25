@@ -1,5 +1,5 @@
 import { ServerResponse } from 'node:http';
-import { StreamToIterable } from '@srcbook/shared';
+import { StreamToIterable } from '@peragus/shared';
 
 /**
  * Pipe a `ReadableStream` through a Node `ServerResponse` object.

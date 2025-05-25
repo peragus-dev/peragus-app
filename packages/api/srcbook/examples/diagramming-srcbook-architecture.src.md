@@ -152,4 +152,4 @@ architecture-beta
 
     lambda_function:L --> R:rds
     lambda_function:L --> R:s3_bucket
-```
+```x

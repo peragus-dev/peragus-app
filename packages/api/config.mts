@@ -1,5 +1,5 @@
 import { eq, and, inArray } from 'drizzle-orm';
-import { type SecretWithAssociatedSessions, randomid } from '@srcbook/shared';
+import { type SecretWithAssociatedSessions, randomid } from '@peragus/shared';
 import {
   configs,
   type Config,
@@ -223,7 +223,7 @@ export function getMCPServerDiscovery(): {
     enableAutoDiscovery: process.env.MCP_AUTO_DISCOVERY === 'true',
     discoveryPaths: process.env.MCP_DISCOVERY_PATHS?.split(',') || [
       './packages/mcp-server',
-      './node_modules/@srcbook/mcp-*',
+      './node_modules/@peragus/mcp-*',
       '~/.local/share/mcp-servers'
     ],
     discoveryInterval: parseInt(process.env.MCP_DISCOVERY_INTERVAL || '300000', 10) // 5 minutes

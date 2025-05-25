@@ -6,7 +6,7 @@ import type {
   PlaceholderCellType,
   CellWithPlaceholderType,
   CodeLanguageType,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import type { SrcbookType } from './types.mjs';
 
 type SrcbookWithPlacebolderType = Omit<SrcbookType, 'cells'> & {
