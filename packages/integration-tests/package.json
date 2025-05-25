@@ -1,5 +1,5 @@
 {
-  "name": "@srcbook/integration-tests",
+  "name": "@peragus/integration-tests",
   "version": "1.0.0",
   "description": "Integration test framework for Srcbook MCP system",
   "type": "module",

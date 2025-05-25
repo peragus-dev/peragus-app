@@ -56,14 +56,14 @@ We recommend using npx to always run the latest version from npm
 
 ```bash
 # Using npm
-npx @peragus/peragus-app@latest start
+npx @peragus/peragusapp@latest start
 
 # Using your package manager equivalent
-pnpm dlx @peragus/peragus-app@latest start
+pnpm dlx @peragus/peragusapp@latest start
 ```
 
-> You can instead use a global install with `<pkg manager> i -g @peragus/peragus-app`
-> and then directly call peragus-app with `peragus-app start`
+> You can instead use a global install with `<pkg manager> i -g @peragus/peragusapp`
+> and then directly call peragusapp with `peragusapp start`
 
 ### Using Docker
 
@@ -108,7 +108,7 @@ You can remove Peragus by first removing the package, and then cleaning its loca
 rm -rf ~/.peragus
 
 # if you configured a global install
-npm uninstall -g @peragus/peragus-app
+npm uninstall -g @peragus/peragusapp
 ```
 
 > If you used another package manager, you will need to use its specific uninstall command
@@ -141,7 +141,7 @@ Peragus can be configured as an MCP (Model Context Protocol) server for other ap
 ```json
 "peragus-mcp-server": {
   "command": "node",
-  "args": ["/path/to/node_modules/@peragus/peragus-app/dist/src/mcp-server/cli.js"],
+  "args": ["/path/to/node_modules/@peragus/peragusapp/dist/src/mcp-server/cli.js"],
   "env": {}
 }
 ```

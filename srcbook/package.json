@@ -1,10 +1,10 @@
 {
-  "name": "peragus",
+  "name": "@peragus/peragusapp",
   "version": "0.1.0",
   "description": "AI-enhanced TypeScript notebook platform for productive development",
   "type": "module",
   "bin": {
-    "peragus-app": "./dist/bin/cli.mjs"
+    "peragusapp": "./dist/bin/cli.mjs"
   },
   "repository": {
     "type": "git",

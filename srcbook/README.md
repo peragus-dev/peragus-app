@@ -50,20 +50,20 @@ We recommend using npx to always run the latest version from npm:
 
 ```bash
 # Using npm
-npx @peragus/peragus-app@latest start
+npx @peragus/peragusapp@latest start
 
 # Using your package manager equivalent
-pnpm dlx @peragus/peragus-app@latest start
+pnpm dlx @peragus/peragusapp@latest start
 ```
 
 You can also install Peragus globally:
 
 ```bash
 # Using npm
-npm install -g @peragus/peragus-app
+npm install -g @peragus/peragusapp
 
 # Then run it using
-peragus-app start
+peragusapp start
 ```
 
 ### MCP Server Integration
@@ -77,7 +77,7 @@ Peragus can also be used as an MCP (Model Context Protocol) server, allowing AI 
   "command": "npx",
   "args": [
     "-y",
-    "@peragus/peragus-app"
+    "@peragus/peragusapp"
   ],
   "env": {}
 }
@@ -88,7 +88,7 @@ Peragus can also be used as an MCP (Model Context Protocol) server, allowing AI 
 ```json
 "peragus-mcp-server": {
   "command": "node",
-  "args": ["/path/to/node_modules/@peragus/peragus-app/dist/src/mcp-server/cli.js"],
+  "args": ["/path/to/node_modules/@peragus/peragusapp/dist/src/mcp-server/cli.js"],
   "env": {}
 }
 ```
@@ -138,7 +138,7 @@ You can remove Peragus by first removing the package, and then cleaning its loca
 rm -rf ~/.peragus
 
 # if you configured a global install
-npm uninstall -g @peragus/peragus-app
+npm uninstall -g @peragus/peragusapp
 ```
 
 ## Analytics and tracking
