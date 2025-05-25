@@ -50,7 +50,7 @@ export default function program() {
 
   program
     .command('start')
-    .description('Start the Srcbook server')
+    .description('Start the Peragus server')
     .option('-p, --port <port>', 'Port to run the server on', '2150')
     .action(({ port }) => {
       startServer(port, () => {
