@@ -21,7 +21,7 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "bcrypt": "^5.1.1",
-    "zod": "^3.22.4",
+    "zod": "catalog:",
     "redis": "^4.6.10",
     "crypto": "^1.0.1",
     "uuid": "^9.0.1",

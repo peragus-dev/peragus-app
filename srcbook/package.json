@@ -1,6 +1,6 @@
 {
   "name": "@peragus/peragusapp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "AI-enhanced TypeScript notebook platform for productive development",
   "type": "module",
   "bin": {
@@ -32,17 +32,17 @@
     "start": "node ./dist/bin/cli.mjs start",
     "depcheck": "depcheck",
     "prebuild": "rm -rf ./dist",
-    "build": "tsc",
+    "build": "tsc && node ./scripts/rewrite-imports.js",
     "lint": "eslint . --max-warnings 0",
     "prepublishOnly": "pnpm run --workspace-root build",
     "preversion": "pnpm run build",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.2.12",
-    "@ai-sdk/openai": "^1.3.22",
-    "@peragus/api": "0.1.0",
-    "@peragus/shared": "0.1.0",
+    "@ai-sdk/anthropic": "catalog:",
+    "@ai-sdk/openai": "catalog:",
+    "@peragus/api": "workspace:^",
+    "@peragus/shared": "workspace:^",
     "ai": "^3.3.33",
     "better-sqlite3": "^11.3.0",
     "chalk": "^5.3.0",
@@ -51,11 +51,11 @@
     "depcheck": "^1.4.7",
     "drizzle-orm": "^0.33.0",
     "express": "^4.20.0",
-    "marked": "^12.0.0",
+    "marked": "catalog:",
     "open": "^10.1.0",
     "posthog-node": "^4.2.0",
-    "ws": "^8.16.0",
-    "zod": "^3.23.8"
+    "ws": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -66,6 +66,9 @@
   },
   "files": [
     "dist/**/*",
+    "public/**/*",
+    "../packages/api/dist/**/*",
+    "../packages/shared/dist/**/*",
     "LICENSE",
     "README.md"
   ]
