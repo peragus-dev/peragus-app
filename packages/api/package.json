@@ -1,5 +1,5 @@
 {
-  "name": "@srcbook/api",
+  "name": "@peragus/api",
   "version": "0.0.18",
   "type": "module",
   "main": "./dist/api/index.mjs",

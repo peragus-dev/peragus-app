@@ -1,5 +1,5 @@
 {
-  "name": "@srcbook/security",
+  "name": "@peragus/security",
   "version": "0.1.0",
   "description": "Comprehensive security framework for MCP ecosystem",
   "type": "module",

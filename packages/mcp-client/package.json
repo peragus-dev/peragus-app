@@ -1,5 +1,5 @@
 {
-  "name": "@srcbook/mcp-client",
+  "name": "@peragus/mcp-client",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.mjs",

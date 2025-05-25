@@ -50,30 +50,45 @@ We recommend using npx to always run the latest version from npm:
 
 ```bash
 # Using npm
-npx peragus@latest start
+npx @peragus/peragusapp@latest start
 
 # Using your package manager equivalent
-pnpm dlx peragus@latest start
+pnpm dlx @peragus/peragusapp@latest start
 ```
 
 You can also install Peragus globally:
 
 ```bash
 # Using npm
-npm install -g peragus
+npm install -g @peragus/peragusapp
 
 # Then run it using
-peragus start
+peragusapp start
 ```
 
 ### MCP Server Integration
 
-Peragus can also be used as an MCP (Model Context Protocol) server, allowing AI models to access and manipulate TypeScript notebooks:
+Peragus can also be used as an MCP (Model Context Protocol) server, allowing AI models to access and manipulate TypeScript notebooks.
+
+#### Using npx (Recommended)
+
+```json
+"peragus": {
+  "command": "npx",
+  "args": [
+    "-y",
+    "@peragus/peragusapp"
+  ],
+  "env": {}
+}
+```
+
+#### Using Node.js Directly (if installed locally)
 
 ```json
 "peragus-mcp-server": {
   "command": "node",
-  "args": ["/path/to/node_modules/peragus/dist/src/mcp-server/cli.js"],
+  "args": ["/path/to/node_modules/@peragus/peragusapp/dist/src/mcp-server/cli.js"],
   "env": {}
 }
 ```
@@ -86,13 +101,13 @@ You can also run Peragus using Docker:
 
 ```bash
 # Build the Docker image
-docker build -t peragus .
+docker build -t peragus/peragus-app .
 
 # Run the container
 # The -p flag maps port 2150 from the container to your host machine
 # First -v flag mounts your local .peragus directory to persist data
 # Second -v flag shares your npm cache for better performance
-docker run -p 2150:2150 -v ~/.peragus:/root/.peragus -v ~/.npm:/root/.npm peragus
+docker run -p 2150:2150 -v ~/.peragus:/root/.peragus -v ~/.npm:/root/.npm peragus/peragus-app
 ```
 
 Make sure to set up your API key after starting the container. You can do this through the web interface at `http://localhost:2150`.
@@ -123,7 +138,7 @@ You can remove Peragus by first removing the package, and then cleaning its loca
 rm -rf ~/.peragus
 
 # if you configured a global install
-npm uninstall -g peragus
+npm uninstall -g @peragus/peragusapp
 ```
 
 ## Analytics and tracking

@@ -56,14 +56,14 @@ We recommend using npx to always run the latest version from npm
 
 ```bash
 # Using npm
-npx peragus@latest start
+npx @peragus/peragusapp@latest start
 
-# Using your pm equivalent
-pnpm dlx peragus@latest start
+# Using your package manager equivalent
+pnpm dlx @peragus/peragusapp@latest start
 ```
 
-> You can instead use a global install with `<pkg manager> i -g peragus`
-> and then directly call peragus with `peragus start`
+> You can instead use a global install with `<pkg manager> i -g @peragus/peragusapp`
+> and then directly call peragusapp with `peragusapp start`
 
 ### Using Docker
 
@@ -71,13 +71,13 @@ You can also run Srcbook using Docker:
 
 ```bash
 # Build the Docker image
-docker build -t peragus .
+docker build -t peragus/peragus-app .
 
 # Run the container
 # The -p flag maps port 2150 from the container to your host machine
 # First -v flag mounts your local .peragus directory to persist data
 # Second -v flag shares your npm cache for better performance
-docker run -p 2150:2150 -v ~/.peragus:/root/.peragus -v ~/.npm:/root/.npm peragus
+docker run -p 2150:2150 -v ~/.peragus:/root/.peragus -v ~/.npm:/root/.npm peragus/peragus-app
 ```
 
 Make sure to set up your API key after starting the container. You can do this through the web interface at `http://localhost:2150`.
@@ -108,10 +108,10 @@ You can remove Peragus by first removing the package, and then cleaning its loca
 rm -rf ~/.peragus
 
 # if you configured a global install
-npm uninstall -g peragus
+npm uninstall -g @peragus/peragusapp
 ```
 
-> if you used another pm you will need to use it's specific uninstall command
+> If you used another package manager, you will need to use its specific uninstall command
 
 ## Analytics and tracking
 
@@ -123,17 +123,30 @@ If you want to disable tracking, you can run Peragus with `PERAGUS_DISABLE_ANALY
 
 Peragus can be configured as an MCP (Model Context Protocol) server for other applications, allowing AI models to access and manipulate TypeScript notebooks. Here's how to set up the Peragus MCP server in your application's MCP configuration:
 
-### Method 1: Using Node.js Directly
+### Method 1: Using npx (Recommended)
 
 ```json
-"peragus-mcp-server": {
-  "command": "node",
-  "args": ["/path/to/peragus-app/packages/mcp-server/dist/cli.js"],
+"peragus": {
+  "command": "npx",
+  "args": [
+    "-y",
+    "@peragus/peragus-app"
+  ],
   "env": {}
 }
 ```
 
-### Method 2: Using Docker
+### Method 2: Using Node.js Directly
+
+```json
+"peragus-mcp-server": {
+  "command": "node",
+  "args": ["/path/to/node_modules/@peragus/peragusapp/dist/src/mcp-server/cli.js"],
+  "env": {}
+}
+```
+
+### Method 3: Using Docker
 
 ```json
 "peragus-mcp-server": {
