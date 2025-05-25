@@ -63,13 +63,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "files": [
-    "dist/**/*",
-    "public/**/*",
-    "../packages/api/dist/**/*",
-    "../packages/shared/dist/**/*",
-    "LICENSE",
-    "README.md"
-  ]
+  }
 }
