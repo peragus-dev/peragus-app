@@ -1,9 +1,21 @@
 {
-  "extends": "@srcbook/configs/ts/base.json",
+  "extends": "@peragus/configs/ts/base.json",
   "compilerOptions": {
     "noEmit": false,
     "allowImportingTsExtensions": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@peragus/api": ["../packages/api/index.mts"],
+      "@peragus/api/*": ["../packages/api/*"],
+      "@peragus/shared": ["../packages/shared/index.mts"],
+      "@peragus/shared/*": ["../packages/shared/*"]
+    }
   },
   "include": ["src", "bin", "tests"],
   "exclude": ["node_modules", "dist", "public"]
