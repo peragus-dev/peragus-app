@@ -1,6 +1,6 @@
 {
   "name": "@peragus/integration-tests",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Integration test framework for Srcbook MCP system",
   "type": "module",
   "main": "dist/index.js",
@@ -15,8 +15,8 @@
     "lint:fix": "eslint src --ext .ts,.mts --fix"
   },
   "dependencies": {
-    "@srcbook/shared": "workspace:^",
-    "@srcbook/mcp-client": "workspace:^",
+    "@peragus/shared": "workspace:^",
+    "@peragus/mcp-client": "workspace:^",
     "@modelcontextprotocol/sdk": "^1.3.0",
     "playwright": "^1.40.0",
     "ws": "catalog:",

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Ban, Maximize, Minimize, PanelBottomClose, PanelBottomOpen, Sparkles } from 'lucide-react';
-import { CodeCellType, PackageJsonCellType, TsServerDiagnosticType } from '@srcbook/shared';
+import { CodeCellType, PackageJsonCellType, TsServerDiagnosticType } from '@peragus/shared'; // @ts-ignore
 import { cn } from '../lib/utils.js';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/underline-flat-tabs.js';
 import { useCells } from './use-cell.js';

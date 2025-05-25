@@ -3,10 +3,10 @@ import {
   DepsValidateResponsePayloadType,
   PackageJsonCellType,
   PackageJsonCellUpdateAttrsType,
-} from '@srcbook/shared';
-import { OutputType } from '@srcbook/components/src/types';
+} from '@peragus/shared';
+import { OutputType } from '@peragus/components/src/types';
 import { SessionChannel } from '@/clients/websocket';
-import { useCells } from '@srcbook/components/src/components/use-cell';
+import { useCells } from '@peragus/components/src/components/use-cell';
 import useEffectOnce from './use-effect-once';
 
 function getValidationError(source: string) {

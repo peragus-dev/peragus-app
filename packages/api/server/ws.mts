@@ -38,7 +38,7 @@ import type {
   AiFixDiagnosticsPayloadType,
   TsServerQuickInfoRequestPayloadType,
   TsServerDefinitionLocationRequestPayloadType,
-} from '@peragus/shared';
+} from '@peragus/shared'; // @ts-ignore
 import {
   CellUpdatePayloadSchema,
   CellRenamePayloadSchema,
@@ -56,7 +56,7 @@ import {
   TsConfigUpdatePayloadSchema,
   TsServerQuickInfoRequestPayloadSchema,
   TsServerDefinitionLocationRequestPayloadSchema,
-} from '@peragus/shared';
+} from '@peragus/shared'; // @ts-ignore
 import tsservers from '../tsservers.mjs';
 import { TsServer } from '../tsserver/tsserver.mjs';
 import WebSocketServer, { MessageContextType } from './ws-client.mjs';

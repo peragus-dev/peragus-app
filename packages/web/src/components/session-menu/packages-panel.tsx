@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { OutputType } from '@srcbook/components/src/types';
+import { OutputType } from '@peragus/components/src/types';
 import {
   Info,
   LoaderCircle,
@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils';
 import CollapsibleContainer from '@/components/collapsible-container';
 import CodeMirror, { keymap, Prec } from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
-import useTheme from '@srcbook/components/src/components/use-theme';
-import { Button } from '@srcbook/components/src/components/ui/button';
+import useTheme from '@peragus/components/src/components/use-theme';
+import { Button } from '@peragus/components/src/components/ui/button';
 import { usePackageJson } from '@/components/use-package-json';
 
 import { SessionMenuPanelContentsProps } from '.';

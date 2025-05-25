@@ -1,8 +1,8 @@
 import { marked, type Tokens } from 'marked';
-import { CodeCellType, MarkdownCellType, TitleCellType } from '@srcbook/shared';
+import { CodeCellType, MarkdownCellType, TitleCellType } from '@peragus/shared';
 import { Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useCells } from '@srcbook/components/src/components/use-cell';
+import { useCells } from '@peragus/components/src/components/use-cell';
 
 type PropsType = Record<string, never>;
 

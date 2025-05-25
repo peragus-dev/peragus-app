@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { WebSocketMessageSchema } from '@srcbook/shared';
+import { WebSocketMessageSchema } from '@peragus/shared';
 
 // A connection that is closed on purpose for "normal" reasons.
 // https://www.rfc-editor.org/rfc/rfc6455.html#section-7.4.1

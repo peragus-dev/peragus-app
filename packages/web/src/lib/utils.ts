@@ -1,6 +1,6 @@
 import type * as React from 'react';
 import type { SessionType } from '../types';
-import type { CellType, TitleCellType } from '@srcbook/shared';
+import type { CellType, TitleCellType } from '@peragus/shared';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

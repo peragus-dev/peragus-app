@@ -1,6 +1,6 @@
 {
   "name": "@peragus/error-recovery",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Comprehensive error recovery system with circuit breakers, health checks, retry mechanisms, and graceful degradation",
   "type": "module",
   "main": "dist/index.js",
@@ -22,7 +22,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

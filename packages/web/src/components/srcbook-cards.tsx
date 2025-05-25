@@ -1,6 +1,6 @@
 import { Sparkles, Circle, PlusIcon, Trash2, Import } from 'lucide-react';
-import { Button } from '@srcbook/components/src/components/ui/button';
-import { CodeLanguageType } from '@srcbook/shared';
+import { Button } from '@peragus/components/src/components/ui/button';
+import { CodeLanguageType } from '@peragus/shared';
 import { SrcbookLogo } from './logos';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';

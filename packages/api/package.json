@@ -1,9 +1,9 @@
 {
   "name": "@peragus/api",
-  "version": "0.0.18",
+  "version": "0.1.0",
   "type": "module",
-  "main": "./dist/api/index.mjs",
-  "types": "./dist/api/index.d.mts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist/**"
   ],
@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "catalog:",
-    "@ai-sdk/google": "^1.0.3",
+    "@ai-sdk/google": "catalog:",
     "@ai-sdk/openai": "catalog:",
     "@ai-sdk/provider": "^1.0.1",
-    "@srcbook/mcp-client": "workspace:^",
-    "@srcbook/shared": "workspace:^",
+    "@peragus/mcp-client": "workspace:^",
+    "@peragus/shared": "workspace:^",
     "ai": "^3.4.33",
     "archiver": "^7.0.1",
     "better-sqlite3": "^11.3.0",

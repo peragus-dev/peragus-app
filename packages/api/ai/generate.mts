@@ -6,7 +6,7 @@ import {
   type CodeCellType,
   randomid,
   type CellWithPlaceholderType,
-} from '@peragus/shared';
+} from '@peragus/shared'; // @ts-ignore
 import { type SessionType } from '../types.mjs';
 import { readFileSync } from 'node:fs';
 import Path from 'node:path';

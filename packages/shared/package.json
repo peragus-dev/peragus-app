@@ -1,6 +1,6 @@
 {
   "name": "@peragus/shared",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.mjs",
   "scripts": {
@@ -12,7 +12,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@ai-sdk/google": "1.0.1",
+    "@ai-sdk/google": "catalog:",
     "@scure/base": "^1.1.8",
     "zod": "catalog:"
   },

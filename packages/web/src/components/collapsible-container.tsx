@@ -4,7 +4,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@srcbook/components/src/components/ui/collapsible';
+} from '@peragus/components/src/components/ui/collapsible';
 
 export default function CollapsibleContainer(props: {
   open: boolean;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { TitleCellType, TsConfigUpdatedPayloadType } from '@srcbook/shared';
+import type { TitleCellType, TsConfigUpdatedPayloadType } from '@peragus/shared';
 import { X, Info } from 'lucide-react';
 import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
@@ -8,10 +8,10 @@ import { json } from '@codemirror/lang-json';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/components/use-settings';
 import CollapsibleContainer from '@/components/collapsible-container';
-import useTheme from '@srcbook/components/src/components/use-theme';
+import useTheme from '@peragus/components/src/components/use-theme';
 import { SessionChannel } from '@/clients/websocket';
 import { useTsconfigJson } from '@/components/use-tsconfig-json';
-import { useCells } from '@srcbook/components/src/components/use-cell';
+import { useCells } from '@peragus/components/src/components/use-cell';
 
 import type { SessionMenuPanelContentsProps } from '.';
 

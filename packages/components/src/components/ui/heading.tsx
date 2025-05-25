@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { cn } from '../../lib/utils.js';
-import { TitleCellUpdateAttrsSchema } from '@srcbook/shared';
+import { TitleCellUpdateAttrsSchema } from '@peragus/shared'; // @ts-ignore
 
 const className =
   'flex w-full whitespace-normal rounded-md border border-transparent bg-transparent px-1 py-1 transition-colors hover:border-input hover:shadow-sm focus-visible:shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50';

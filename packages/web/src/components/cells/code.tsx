@@ -9,13 +9,13 @@ import {
   AiGeneratedCellPayloadType,
   TsServerDefinitionLocationResponsePayloadType,
   TsServerDiagnosticType,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import { useSettings } from '@/components/use-settings';
-import CodeCell from '@srcbook/components/src/components/cells/code';
+import CodeCell from '@peragus/components/src/components/cells/code';
 import { SessionType } from '@/types';
-import { CellModeType } from '@srcbook/components/src/types';
+import { CellModeType } from '@peragus/components/src/types';
 import { SessionChannel } from '@/clients/websocket';
-import { useCells } from '@srcbook/components/src/components/use-cell';
+import { useCells } from '@peragus/components/src/components/use-cell';
 import { mapCMLocationToTsServer, mapTsServerLocationToCM } from './util';
 import { toast } from 'sonner';
 import { getFileContent } from '@/lib/server';
@@ -32,8 +32,8 @@ import CodeMirror, {
   keymap,
   Prec,
 } from '@uiw/react-codemirror';
-import useTheme from '@srcbook/components/src/components/use-theme';
-import { Dialog, DialogContent } from '@srcbook/components/src/components/ui/dialog';
+import useTheme from '@peragus/components/src/components/use-theme';
+import { Dialog, DialogContent } from '@peragus/components/src/components/ui/dialog';
 
 function tsLinter(
   cell: CodeCellType,

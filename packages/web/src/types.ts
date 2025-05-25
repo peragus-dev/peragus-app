@@ -1,4 +1,4 @@
-import { CellType, CodeLanguageType, AiProviderType } from '@srcbook/shared';
+import { CellType, CodeLanguageType, AiProviderType } from '@peragus/shared';
 
 export interface FsObjectType {
   path: string;

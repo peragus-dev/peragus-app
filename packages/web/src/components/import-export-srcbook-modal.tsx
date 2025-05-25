@@ -17,11 +17,11 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-} from '@srcbook/components/src/components/ui/underline-flat-tabs';
+} from '@peragus/components/src/components/ui/underline-flat-tabs';
 import { showSaveFilePicker } from '@/lib/file-system-access';
-import { Input } from '@srcbook/components/src/components/ui/input';
-import { Textarea } from '@srcbook/components/src/components/ui/textarea';
-import { Button } from '@srcbook/components/src/components/ui/button';
+import { Input } from '@peragus/components/src/components/ui/input';
+import { Textarea } from '@peragus/components/src/components/ui/textarea';
+import { Button } from '@peragus/components/src/components/ui/button';
 import SrcMdUploadDropZone from '@/components/srcmd-upload-drop-zone';
 import {
   Dialog,
@@ -29,7 +29,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@srcbook/components/src/components/ui/dialog';
+} from '@peragus/components/src/components/ui/dialog';
 
 export function ImportSrcbookModal({
   open,

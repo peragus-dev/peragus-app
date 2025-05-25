@@ -1,6 +1,6 @@
 {
   "name": "@peragus/peragusapp",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "AI-enhanced TypeScript notebook platform for productive development",
   "type": "module",
   "bin": {
@@ -63,10 +63,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "files": [
-    "dist/**/*",
-    "LICENSE",
-    "README.md"
-  ]
+  }
 }

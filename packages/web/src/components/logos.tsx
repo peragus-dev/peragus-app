@@ -1,4 +1,4 @@
-import { CodeLanguageType } from '@srcbook/shared';
+import { CodeLanguageType } from '@peragus/shared';
 
 type PropsType = {
   size?: string | number;

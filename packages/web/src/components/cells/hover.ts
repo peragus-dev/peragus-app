@@ -3,13 +3,13 @@ import type {
   TsServerJsDocTagsType,
   TsServerJSDocType,
   TsServerQuickInfoResponsePayloadType,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import { Extension, hoverTooltip } from '@uiw/react-codemirror';
 import { mapCMLocationToTsServer } from './util';
 import { SessionChannel } from '@/clients/websocket';
 import { parse } from 'marked';
-import { formatCode } from '@srcbook/components/src/lib/code-theme';
-import { type ThemeType } from '@srcbook/components/src/components/use-theme';
+import { formatCode } from '@peragus/components/src/lib/code-theme';
+import { type ThemeType } from '@peragus/components/src/components/use-theme';
 
 /** Hover extension for TS server information */
 export function tsHover(cell: CodeCellType, channel: SessionChannel, theme: ThemeType): Extension {

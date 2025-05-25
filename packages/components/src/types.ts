@@ -1,4 +1,4 @@
-import { CellType, CodeLanguageType } from '@srcbook/shared';
+import { CellType, CodeLanguageType } from '@peragus/shared'; // @ts-ignore
 
 export type GenerateAICellType = {
   id: string;

@@ -11,17 +11,17 @@ import {
   CodeCellType,
   TitleCellType,
   TsServerCellSuggestionsPayloadType,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import { loadSession, loadSessions, getConfig } from '@/lib/server';
 import type { SessionType, SettingsType } from '@/types';
-import { GenerateAICellType, OutputType } from '@srcbook/components/src/types';
-import { TitleCell, MarkdownCell } from '@srcbook/components';
+import { GenerateAICellType, OutputType } from '@peragus/components/src/types';
+import { TitleCell, MarkdownCell } from '@peragus/components';
 import ControlledCodeCell from '@/components/cells/code';
 import GenerateAiCell from '@/components/cells/generate-ai';
 import SessionMenu, { SESSION_MENU_PANELS, Panel } from '@/components/session-menu';
-import { Button } from '@srcbook/components/src/components/ui/button';
+import { Button } from '@peragus/components/src/components/ui/button';
 import { SessionChannel } from '@/clients/websocket';
-import { CellsProvider, useCells } from '@srcbook/components/src/components/use-cell';
+import { CellsProvider, useCells } from '@peragus/components/src/components/use-cell';
 import { cn } from '@/lib/utils';
 import { useHotkeys } from 'react-hotkeys-hook';
 import InstallPackageModal from '@/components/install-package-modal';

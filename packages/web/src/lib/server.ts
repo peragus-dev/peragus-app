@@ -4,7 +4,7 @@ import type {
   MarkdownCellType,
   CodeCellType,
   SecretWithAssociatedSessions,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import { SessionType, ExampleSrcbookType } from '@/types';
 import SRCBOOK_CONFIG from '@/config';
 

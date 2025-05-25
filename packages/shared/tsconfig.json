@@ -1,11 +1,13 @@
 {
-  "extends": "@srcbook/configs/ts/base.json",
+  "extends": "@peragus/configs/ts/base.json",
   "compilerOptions": {
     "composite": true,
     "incremental": true,
     "noEmit": false,
     "allowImportingTsExtensions": false,
-    "outDir": "dist"
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "esModuleInterop": true
   },
   "include": ["index.mts", "src/**/*.mts"],
   "exclude": ["node_modules", "dist"]

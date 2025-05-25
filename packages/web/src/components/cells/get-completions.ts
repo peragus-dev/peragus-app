@@ -1,6 +1,6 @@
 import { SessionChannel } from '@/clients/websocket';
 import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
-import { CodeCellType, TsServerCompletionEntriesPayloadType } from '@srcbook/shared';
+import { CodeCellType, TsServerCompletionEntriesPayloadType } from '@peragus/shared';
 import { mapCMLocationToTsServer } from './util';
 
 export function getCompletions(
