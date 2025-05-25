@@ -9,10 +9,10 @@
  */
 import readline from 'node:readline';
 import http from 'node:http';
-import express from 'express';
+import express, { Request, Response } from 'express';
 // @ts-ignore
 import { WebSocketServer as WsWebSocketServer } from 'ws';
-import { wss, app, posthog } from '@srcbook/api';
+import { wss, app, posthog } from '@peragus/api';
 import chalk from 'chalk';
 import { pathTo, getPackageJson } from './utils.mjs';
 
@@ -42,7 +42,7 @@ const webSocketServer = new WsWebSocketServer({ server });
 webSocketServer.on('connection', wss.onConnection);
 
 // Serve the react-app for all other routes, handled by client-side routing
-app.get('*', (_req, res) => res.sendFile(INDEX_HTML));
+app.get('*', (_req: Request, res: Response) => res.sendFile(INDEX_HTML));
 
 console.log(chalk.green('Initialization complete'));
 
