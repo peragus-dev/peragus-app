@@ -7,7 +7,7 @@ import {
   TsServerQuickInfoResponseSchema,
   TsServerCompletionEntriesSchema,
 } from './tsserver.mjs';
-import { FileSchema } from './apps.mjs';
+import { FileSchema } from './files.mjs';
 
 // A _message_ over websockets
 export const WebSocketMessageSchema = z.tuple([
