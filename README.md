@@ -16,38 +16,24 @@
   <a href="https://hub.srcbook.com">Hub</a> 
 </p>
 
-## Srcbook
+## Peragus
 
-Srcbook is a TypeScript-centric app development platform, with 2 main products:
+Peragus is an AI-enhanced TypeScript notebook platform designed for productive development with AI assistance.
 
-- an AI app builder (also available [hosted online](https://srcbook.com/))
-- a TypeScript notebook
-
-Srcbook is open-source (apache2) and runs locally on your machine. You'll need to bring your own API key for AI usage (we strongly recommend Anthropic with `claude-3-5-sonnet-latest`).
+Peragus is open-source (apache2) and runs locally on your machine. You'll need to bring your own API key for AI usage (we strongly recommend Anthropic with `claude-3-5-sonnet-latest`).
 
 ## Features
-
-### App Builder
-
-- AI app builder for TypeScript
-- Create, edit and run web apps
-- Use AI to generate the boilerplate, modify the code, and fix things
-- Edit the app with a hot-reloading web preview
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://i.imgur.com/lLJPZOs.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://i.imgur.com/k4xAyCQ.png">
-  <img alt="Example Srcbook" src="https://i.imgur.com/k4xAyCQ.png">
-</picture>
 
 ### Notebooks
 
 - Create, run, and share TypeScript notebooks
 - Export to valid markdown format (.src.md)
-- AI features for exploring and iterating on ideas
+- Advanced AI assistance for exploring and iterating on ideas
+- Intelligent code completion and suggestions
+- Integrated debugging and testing capabilities
 - Diagraming with [mermaid](https://mermaid.js.org) for rich annotations
 - Local execution with a web interface
-- Powered by Node.js
+- Powered by Node.js with TypeScript optimizations
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://imagedelivery.net/oEu9i3VEvGGhcGGAYXSBLQ/2a4fa0f6-ef1b-4606-c9fa-b31d61b7c300/public">
@@ -61,7 +47,7 @@ See [FAQ](https://github.com/srcbookdev/srcbook/blob/main/FAQ.md).
 
 ## Getting Started
 
-Srcbook runs locally on your machine as a CLI application with a web interface.
+Peragus runs locally on your machine as a CLI application with a web interface.
 
 ### Requirements
 
@@ -74,14 +60,14 @@ We recommend using npx to always run the latest version from npm
 
 ```bash
 # Using npm
-npx srcbook@latest start
+npx peragus@latest start
 
 # Using your pm equivalent
-pnpm dlx srcbook@latest start
+pnpm dlx peragus@latest start
 ```
 
-> You can instead use a global install with `<pkg manager> i -g srcbook`
-> and then directly call srcbook with `srcbook start`
+> You can instead use a global install with `<pkg manager> i -g peragus`
+> and then directly call peragus with `peragus start`
 
 ### Using Docker
 
@@ -89,13 +75,13 @@ You can also run Srcbook using Docker:
 
 ```bash
 # Build the Docker image
-docker build -t srcbook .
+docker build -t peragus .
 
 # Run the container
 # The -p flag maps port 2150 from the container to your host machine
-# First -v flag mounts your local .srcbook directory to persist data
+# First -v flag mounts your local .peragus directory to persist data
 # Second -v flag shares your npm cache for better performance
-docker run -p 2150:2150 -v ~/.srcbook:/root/.srcbook -v ~/.npm:/root/.npm srcbook
+docker run -p 2150:2150 -v ~/.peragus:/root/.peragus -v ~/.npm:/root/.npm peragus
 ```
 
 Make sure to set up your API key after starting the container. You can do this through the web interface at `http://localhost:2150`.
@@ -103,10 +89,10 @@ Make sure to set up your API key after starting the container. You can do this t
 ### Current Commands
 
 ```bash
-$ srcbook -h
-Usage: srcbook [options] [command]
+$ peragus -h
+Usage: peragus [options] [command]
 
-Srcbook is a interactive programming environment for TypeScript
+Peragus is an interactive programming environment for TypeScript with AI assistance
 
 Options:
   -V, --version                 output the version number
@@ -120,22 +106,22 @@ Commands:
 
 ### Uninstalling
 
-You can remove srcbook by first removing the package, and then cleaning it's local directory on disk:
+You can remove Peragus by first removing the package, and then cleaning its local directory on disk:
 
 ```bash
-rm -rf ~/.srcbook
+rm -rf ~/.peragus
 
 # if you configured a global install
-npm uninstall -g srcbook
+npm uninstall -g peragus
 ```
 
 > if you used another pm you will need to use it's specific uninstall command
 
 ## Analytics and tracking
 
-In order to improve Srcbook, we collect some behavioral analytics. We don't collect any Personal Identifiable Information (PII), our goals are simply to improve the application. The code is open source so you don't have to trust us, you can verify! You can find more information in our [privacy policy](https://github.com/srcbookdev/srcbook/blob/main/PRIVACY-POLICY.md).
+In order to improve Peragus, we collect some behavioral analytics. We don't collect any Personal Identifiable Information (PII), our goals are simply to improve the application. The code is open source so you don't have to trust us, you can verify! You can find more information in our privacy policy.
 
-If you want to disable tracking, you can run Srcbook with `SRCBOOK_DISABLE_ANALYTICS=true` set in the environment.
+If you want to disable tracking, you can run Peragus with `PERAGUS_DISABLE_ANALYTICS=true` set in the environment.
 
 ## Contributing
 
