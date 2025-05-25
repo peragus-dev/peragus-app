@@ -14,7 +14,7 @@ import type { SessionType } from '@peragus/api/types.mjs';
 // @ts-ignore - ignore import errors during build time
 import type { CellType, CodeLanguageType } from '@peragus/shared';
 // @ts-ignore - ignore import errors during build time
-import { randomid, validFilename, createDirIfNotExists } from '@peragus/shared';
+import { randomid, validFilename } from '@peragus/shared';
 
 import { logger } from './logger.mjs';
 import { 
