@@ -1,4 +1,4 @@
-import z from 'zod';
+import * as z from 'zod';
 import { CellSchema, MarkdownCellSchema, CodeCellSchema, CellUpdateAttrsSchema } from './cells.mjs';
 import {
   TsServerDefinitionLocationSchema,
