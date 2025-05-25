@@ -1,6 +1,6 @@
 import { ServerResponse } from 'node:http';
 // @ts-ignore - ignore import errors during build time
-import { StreamToIterable } from '@peragus/shared';
+import { StreamToIterable } from '@peragus/shared'; // @ts-ignore
 
 /**
  * Pipe a `ReadableStream` through a Node `ServerResponse` object.

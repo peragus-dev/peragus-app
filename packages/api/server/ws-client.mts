@@ -2,7 +2,7 @@ import { IncomingMessage } from 'node:http';
 import z from 'zod';
 import { type RawData, WebSocket } from 'ws';
 // @ts-ignore - ignore import errors during build time
-import { WebSocketMessageSchema } from '@peragus/shared';
+import { WebSocketMessageSchema } from '@peragus/shared'; // @ts-ignore
 
 type TopicPart = { dynamic: false; segment: string } | { dynamic: true; parameter: string };
 
