@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "catalog:",
-    "@ai-sdk/google": "^1.0.3",
+    "@ai-sdk/google": "catalog:",
     "@ai-sdk/openai": "catalog:",
     "@ai-sdk/provider": "^1.0.1",
     "@peragus/mcp-client": "workspace:^",
