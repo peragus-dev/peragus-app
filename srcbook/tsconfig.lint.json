@@ -1,4 +1,9 @@
 {
-  "include": ["src", "bin", "tests"],
-  "exclude": ["node_modules", "dist", "public"]
+  "extends": "./tsconfig.json",
+  "include": [
+    "src",
+    "bin",
+    "tests",
+    ".eslintrc.cjs"
+  ]
 }

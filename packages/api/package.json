@@ -2,8 +2,8 @@
   "name": "@peragus/api",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/api/index.mjs",
-  "types": "./dist/api/index.d.mts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist/**"
   ],

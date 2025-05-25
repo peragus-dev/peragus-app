@@ -1,10 +1,15 @@
 {
-  "extends": "@srcbook/configs/ts/base.json",
+  "extends": "@peragus/configs/ts/base.json",
   "compilerOptions": {
     "noEmit": false,
     "allowImportingTsExtensions": false,
     "outDir": "dist",
-    "types": ["vitest/globals", "vite/client"]
+    "types": ["vitest/globals", "vite/client"],
+    "skipLibCheck": true,
+    "paths": {
+      "@peragus/shared": ["../shared/src"],
+      "@peragus/shared/*": ["../shared/src/*"]
+    }
   },
   "include": ["**/*.mts"],
   "exclude": ["node_modules", "dist"]
