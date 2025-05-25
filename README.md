@@ -119,6 +119,64 @@ In order to improve Peragus, we collect some behavioral analytics. We don't coll
 
 If you want to disable tracking, you can run Peragus with `PERAGUS_DISABLE_ANALYTICS=true` set in the environment.
 
+## Using Peragus as an MCP Server
+
+Peragus can be configured as an MCP (Model Context Protocol) server for other applications, allowing AI models to access and manipulate TypeScript notebooks. Here's how to set up the Peragus MCP server in your application's MCP configuration:
+
+### Method 1: Using Node.js Directly
+
+```json
+"peragus-mcp-server": {
+  "command": "node",
+  "args": ["/path/to/peragus-app/packages/mcp-server/dist/cli.js"],
+  "env": {}
+}
+```
+
+### Method 2: Using Docker
+
+```json
+"peragus-mcp-server": {
+  "command": "docker",
+  "args": [
+    "run",
+    "-i",
+    "--rm",
+    "-v", "/path/to/notebooks:/notebooks",
+    "peragus/mcp-server:latest"
+  ],
+  "env": {}
+}
+```
+
+### Environment Variables and Secrets
+
+Peragus maintains environment variables as secrets that need to be configured through the Peragus UI. These should not be set directly in the client application's MCP config. Important environment variables include:
+
+- `PERAGUS_API_KEY`: Your API key for AI services
+- `PERAGUS_NOTEBOOK_DIR`: Directory where notebooks are stored (defaults to `~/.peragus/notebooks`)
+- `PERAGUS_SERVER_PORT`: Port for the Peragus server (defaults to 2150)
+
+### Available MCP Tools and Resources
+
+When configured as an MCP server, Peragus provides access to the following:
+
+**Tools:**
+- `create_notebook`: Create new TypeScript notebooks
+- `edit_notebook`: Add, update, or delete cells
+- `execute_notebook`: Run code cells in a notebook
+- `list_notebooks`: List available notebooks with filtering
+- `get_notebook_content`: Retrieve notebook content
+- `save_notebook`: Save changes to a notebook
+- `delete_notebook`: Delete notebooks
+- `import_notebook`: Import notebooks from files or URLs
+
+**Resources:**
+- Example notebooks: `notebook://examples/{id}`
+- User notebooks: `notebook://user/{id}`
+
+This allows AI models to create, edit, and execute TypeScript notebooks on behalf of users.
+
 ## Acknowledgments
 
 Peragus is based on [Srcbook](https://github.com/srcbookdev/srcbook), an open-source TypeScript-centric app development platform. We'd like to thank the Srcbook team for their excellent work which provided the foundation for this project.
