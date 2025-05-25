@@ -1,9 +1,28 @@
 {
-  "name": "srcbook",
-  "version": "0.0.19",
-  "description": "TypeScript notebooks",
+  "name": "peragus",
+  "version": "0.1.0",
+  "description": "AI-enhanced TypeScript notebook platform for productive development",
   "type": "module",
   "bin": "./dist/bin/cli.mjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/peragus-dev/peragus-app.git"
+  },
+  "homepage": "https://github.com/peragus-dev/peragus-app",
+  "author": "glassBead",
+  "license": "Apache-2.0",
+  "keywords": [
+    "typescript",
+    "notebook",
+    "javascript",
+    "ai",
+    "development",
+    "coding",
+    "programming",
+    "interactive",
+    "mcp",
+    "model-context-protocol"
+  ],
   "scripts": {
     "start": "node ./dist/bin/cli.mjs start",
     "depcheck": "depcheck",
@@ -39,5 +58,13 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "files": [
+    "dist/**/*",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
