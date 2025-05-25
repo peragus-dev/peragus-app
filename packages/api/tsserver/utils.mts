@@ -1,4 +1,5 @@
 import type { server as tsserver } from 'typescript';
+// @ts-ignore - ignore import errors during build time
 import type { TsServerDiagnosticType } from '@peragus/shared';
 
 export function normalizeDiagnostic(

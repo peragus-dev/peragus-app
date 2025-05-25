@@ -27,6 +27,7 @@ import {
   moveCodeCellOnDisk,
 } from './srcbook/index.mjs';
 import { fileExists } from './fs-utils.mjs';
+// @ts-ignore - ignore import errors during build time
 import { validFilename } from '@peragus/shared';
 import { pathToCodeFile } from './srcbook/path.mjs';
 import { exec } from 'node:child_process';

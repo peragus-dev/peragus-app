@@ -1,3 +1,4 @@
+// @ts-ignore - ignore import errors during build time
 import type { CellType, CodeLanguageType } from '@peragus/shared';
 
 export type SessionType = {

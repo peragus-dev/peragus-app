@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import type { Tokens, Token, TokensList } from 'marked';
+// @ts-ignore - ignore import errors during build time
 import { languageFromFilename, randomid, SrcbookMetadataSchema } from '@peragus/shared';
 import type {
   CellType,

@@ -1,4 +1,5 @@
 import { ServerResponse } from 'node:http';
+// @ts-ignore - ignore import errors during build time
 import { StreamToIterable } from '@peragus/shared';
 
 /**

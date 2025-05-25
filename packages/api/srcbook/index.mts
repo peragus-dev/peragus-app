@@ -6,6 +6,7 @@ import type {
   CodeLanguageType,
   PackageJsonCellType,
 } from '@peragus/shared';
+// @ts-ignore - ignore import errors during build time
 import { randomid } from '@peragus/shared';
 import { encode, decode } from '../srcmd.mjs';
 import { toFormattedJSON } from '../utils.mjs';

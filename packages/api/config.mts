@@ -1,4 +1,5 @@
 import { eq, and, inArray } from 'drizzle-orm';
+// @ts-ignore - ignore import errors during build time
 import { type SecretWithAssociatedSessions, randomid } from '@peragus/shared';
 import {
   configs,

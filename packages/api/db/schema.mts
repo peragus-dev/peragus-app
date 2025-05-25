@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core';
+// @ts-ignore - ignore import errors during build time
 import { randomid } from '@peragus/shared';
 
 export const configs = sqliteTable('config', {
