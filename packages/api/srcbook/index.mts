@@ -5,8 +5,8 @@ import type {
   CodeCellType,
   CodeLanguageType,
   PackageJsonCellType,
-} from '@srcbook/shared';
-import { randomid } from '@srcbook/shared';
+} from '@peragus/shared';
+import { randomid } from '@peragus/shared';
 import { encode, decode } from '../srcmd.mjs';
 import { toFormattedJSON } from '../utils.mjs';
 import { readdir } from '../fs-utils.mjs';

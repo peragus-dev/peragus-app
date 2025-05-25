@@ -2,7 +2,7 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { getConfig } from '../config.mjs';
 import type { LanguageModel } from 'ai';
-import { getDefaultModel, type AiProviderType } from '@srcbook/shared';
+import { getDefaultModel, type AiProviderType } from '@peragus/shared';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
 /**

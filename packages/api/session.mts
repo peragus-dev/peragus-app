@@ -8,7 +8,7 @@ import type {
   PackageJsonCellType,
   CodeCellType,
   CellErrorType,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import {
   TitleCellUpdateAttrsSchema,
   MarkdownCellUpdateAttrsSchema,
@@ -16,7 +16,7 @@ import {
   PackageJsonCellUpdateAttrsSchema,
   languageFromFilename,
   extensionsForLanguage,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import { encode, decodeDir } from './srcmd.mjs';
 import { SRCBOOKS_DIR } from './constants.mjs';
 import type { SessionType } from './types.mjs';
@@ -27,7 +27,7 @@ import {
   moveCodeCellOnDisk,
 } from './srcbook/index.mjs';
 import { fileExists } from './fs-utils.mjs';
-import { validFilename } from '@srcbook/shared';
+import { validFilename } from '@peragus/shared';
 import { pathToCodeFile } from './srcbook/path.mjs';
 import { exec } from 'node:child_process';
 import { npmInstall } from './exec.mjs';

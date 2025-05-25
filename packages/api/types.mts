@@ -1,4 +1,4 @@
-import type { CellType, CodeLanguageType } from '@srcbook/shared';
+import type { CellType, CodeLanguageType } from '@peragus/shared';
 
 export type SessionType = {
   id: string;

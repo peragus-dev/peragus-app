@@ -1,5 +1,5 @@
 import type { server as tsserver } from 'typescript';
-import type { TsServerDiagnosticType } from '@srcbook/shared';
+import type { TsServerDiagnosticType } from '@peragus/shared';
 
 export function normalizeDiagnostic(
   diagnostic: tsserver.protocol.Diagnostic | tsserver.protocol.DiagnosticWithLinePosition,

@@ -1,13 +1,13 @@
 import { marked } from 'marked';
 import type { Tokens, Token, TokensList } from 'marked';
-import { languageFromFilename, randomid, SrcbookMetadataSchema } from '@srcbook/shared';
+import { languageFromFilename, randomid, SrcbookMetadataSchema } from '@peragus/shared';
 import type {
   CellType,
   CodeCellType,
   MarkdownCellType,
   PackageJsonCellType,
   TitleCellType,
-} from '@srcbook/shared';
+} from '@peragus/shared';
 import type { DecodeCellsResult, DecodeResult } from './types.mjs';
 import { toFormattedJSON } from '../utils.mjs';
 

@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'node:http';
 import z from 'zod';
 import { type RawData, WebSocket } from 'ws';
-import { WebSocketMessageSchema } from '@srcbook/shared';
+import { WebSocketMessageSchema } from '@peragus/shared';
 
 type TopicPart = { dynamic: false; segment: string } | { dynamic: true; parameter: string };
 
