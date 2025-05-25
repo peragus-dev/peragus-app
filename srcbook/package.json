@@ -39,10 +39,10 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "catalog:",
-    "@ai-sdk/openai": "catalog:",
-    "@peragus/api": "workspace:^",
-    "@peragus/shared": "workspace:^",
+    "@ai-sdk/anthropic": "^2.4.2",
+    "@ai-sdk/openai": "^2.3.6",
+    "@peragus/api": "0.1.0",
+    "@peragus/shared": "0.1.0",
     "ai": "^3.3.33",
     "better-sqlite3": "^11.3.0",
     "chalk": "^5.3.0",
@@ -51,11 +51,11 @@
     "depcheck": "^1.4.7",
     "drizzle-orm": "^0.33.0",
     "express": "^4.20.0",
-    "marked": "catalog:",
+    "marked": "^12.0.0",
     "open": "^10.1.0",
     "posthog-node": "^4.2.0",
-    "ws": "catalog:",
-    "zod": "catalog:"
+    "ws": "^8.16.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
