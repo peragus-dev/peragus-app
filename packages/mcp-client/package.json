@@ -1,0 +1,30 @@
+{
+  "name": "@srcbook/mcp-client",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "prebuild": "rm -rf ./dist",
+    "build": "tsc",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "depcheck": "depcheck"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.3.0",
+    "@srcbook/shared": "workspace:^",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "depcheck": "^1.4.7",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.5"
+  }
+}

@@ -1,6 +1,8 @@
 {
   "extends": "@srcbook/configs/ts/base.json",
   "compilerOptions": {
+    "composite": true,
+    "incremental": true,
     "noEmit": false,
     "allowImportingTsExtensions": false,
     "outDir": "dist"
