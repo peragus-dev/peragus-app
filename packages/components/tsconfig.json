@@ -1,11 +1,16 @@
 {
-  "extends": "@srcbook/configs/ts/base.json",
+  "extends": "@peragus/configs/ts/base.json",
   "compilerOptions": {
     "noEmit": false,
     "allowImportingTsExtensions": false,
     "outDir": "dist",
     "jsx": "react-jsx",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "@peragus/shared": ["../shared/src"],
+      "@peragus/shared/*": ["../shared/src/*"]
+    }
   },
   "include": ["src/index.tsx", "src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "dist"]

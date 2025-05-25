@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "files": [
-    "./eslint/library.js"
+    "./eslint/library.js",
+    "./ts/base.json",
+    "./ts/react-library.json"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.5.0",
