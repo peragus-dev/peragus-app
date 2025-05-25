@@ -35,8 +35,16 @@ import { readdir } from '../fs-utils.mjs';
 import { EXAMPLE_SRCBOOKS } from '../srcbook/examples.mjs';
 import { pathToSrcbook } from '../srcbook/path.mjs';
 import { isSrcmdPath } from '../srcmd/paths.mjs';
+import mcpRoutes from '../mcp/routes.mjs';
+import { mcpClientService } from '../mcp/client-service.mjs';
 
 const app: Application = express();
+
+// Initialize MCP client service on startup
+mcpClientService.initialize().catch((error: Error) => {
+  console.warn('Failed to initialize MCP client service:', error);
+  console.warn('MCP functionality will be unavailable');
+});
 
 const router = express.Router();
 
@@ -393,8 +401,8 @@ router.post('/subscribe', cors(), async (req, res) => {
   }
 });
 
-
-
+// Mount MCP routes
+router.use('/mcp', mcpRoutes);
 
 app.use('/api', router);
 

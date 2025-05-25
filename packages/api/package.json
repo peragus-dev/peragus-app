@@ -2,8 +2,8 @@
   "name": "@srcbook/api",
   "version": "0.0.18",
   "type": "module",
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "main": "./dist/api/index.mjs",
+  "types": "./dist/api/index.d.mts",
   "files": [
     "dist/**"
   ],
@@ -11,7 +11,7 @@
     "dev": "vite-node -w dev-server.mts",
     "test": "vitest",
     "prebuild": "rm -rf ./dist",
-    "build": "tsc && cp -R ./drizzle ./dist/drizzle && cp -R ./srcbook/examples ./dist/srcbook/examples && cp -R ./prompts ./dist/prompts",
+    "build": "tsc && cp -R ./drizzle ./dist/drizzle && mkdir -p ./dist/srcbook && cp -R ./srcbook/examples ./dist/srcbook/examples && cp -R ./prompts ./dist/prompts",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc",
     "depcheck": "depcheck",
@@ -26,6 +26,7 @@
     "@ai-sdk/google": "^1.0.3",
     "@ai-sdk/openai": "catalog:",
     "@ai-sdk/provider": "^1.0.1",
+    "@srcbook/mcp-client": "workspace:^",
     "@srcbook/shared": "workspace:^",
     "ai": "^3.4.33",
     "archiver": "^7.0.1",
