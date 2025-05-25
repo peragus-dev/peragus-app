@@ -42,11 +42,11 @@ function startServer(port: string, callback: () => void) {
 }
 
 export default function program() {
-  const { name, description, version } = getPackageJson();
+  const { name, version } = getPackageJson();
 
   const program = new Command();
 
-  program.name(name).description(description).version(version);
+  program.name(name).description('Peragus is an interactive programming environment for TypeScript with AI assistance').version(version);
 
   program
     .command('start')
