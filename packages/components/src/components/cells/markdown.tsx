@@ -5,7 +5,7 @@ import Markdown from 'marked-react';
 import CodeMirror, { keymap, Prec, EditorView } from '@uiw/react-codemirror';
 import { markdown } from '@codemirror/lang-markdown';
 import { CircleAlert, Trash2, Pencil } from 'lucide-react';
-import { CellType, MarkdownCellType, MarkdownCellUpdateAttrsType } from '@srcbook/shared';
+import { CellType, MarkdownCellType, MarkdownCellUpdateAttrsType } from '@peragus/shared'; // @ts-ignore
 import { cn } from '../../lib/utils.js';
 import { Button } from '../ui/button.js';
 import DeleteCellWithConfirmation from '../delete-cell-dialog.js';

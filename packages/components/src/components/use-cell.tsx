@@ -15,10 +15,10 @@ import {
   TsServerDiagnosticType,
   TsServerSuggestionType,
   getDefaultExtensionForLanguage,
-} from '@srcbook/shared';
+} from '@peragus/shared'; // @ts-ignore
 import { GenerateAICellType, OutputType } from '../types';
 
-import { randomid } from '@srcbook/shared';
+import { randomid } from '@peragus/shared'; // @ts-ignore
 
 type ClientCellType = CellType | GenerateAICellType;
 

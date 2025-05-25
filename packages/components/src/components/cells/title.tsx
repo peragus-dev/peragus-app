@@ -1,4 +1,4 @@
-import { TitleCellType, TitleCellUpdateAttrsType } from '@srcbook/shared';
+import { TitleCellType, TitleCellUpdateAttrsType } from '@peragus/shared'; // @ts-ignore
 import { EditableH1 } from '../ui/heading.js';
 
 type BaseProps = {

@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
 import AiGenerateTipsDialog from '../ai-generate-tips-dialog.js';
-import { CellType, CodeCellType, CodeCellUpdateAttrsType } from '@srcbook/shared';
+import { CellType, CodeCellType, CodeCellUpdateAttrsType } from '@peragus/shared'; // @ts-ignore
 import { cn } from '../../lib/utils.js';
 import { CellModeType, SessionType } from '../../types';
 import { Button } from '../ui/button.js';
