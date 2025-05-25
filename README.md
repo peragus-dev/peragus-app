@@ -119,6 +119,10 @@ In order to improve Peragus, we collect some behavioral analytics. We don't coll
 
 If you want to disable tracking, you can run Peragus with `PERAGUS_DISABLE_ANALYTICS=true` set in the environment.
 
+## Acknowledgments
+
+Peragus is based on [Srcbook](https://github.com/srcbookdev/srcbook), an open-source TypeScript-centric app development platform. We'd like to thank the Srcbook team for their excellent work which provided the foundation for this project.
+
 ## Contributing
 
-For development instructions, see [CONTRIBUTING.md](https://github.com/srcbookdev/srcbook/blob/main/CONTRIBUTING.md).
+For development instructions, see our CONTRIBUTING.md file.
