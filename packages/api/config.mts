@@ -32,10 +32,21 @@ async function init() {
   }
 }
 
-// Block rest of module until we have initialized config.
-await init();
+// Initialize the config at import time
+let initialized = false;
+let initPromise = init().then(() => {
+  initialized = true;
+});
+
+// Helper to ensure initialization is complete
+async function ensureInitialized() {
+  if (!initialized) {
+    await initPromise;
+  }
+}
 
 export async function getConfig(): Promise<Config> {
+  await ensureInitialized();
   const results = await db.select().from(configs);
 
   if (results.length !== 1) {
@@ -49,11 +60,13 @@ export async function getConfig(): Promise<Config> {
 }
 
 export async function updateConfig(attrs: Partial<Config>) {
+  await ensureInitialized();
   return db.update(configs).set(attrs).returning();
 }
 
 
 export async function getSecrets(): Promise<Array<SecretWithAssociatedSessions>> {
+  await ensureInitialized();
   const secretsResult = await db.select().from(secrets);
   const secretsToSessionResult = await db
     .select()
@@ -86,6 +99,7 @@ export async function getSecretsAssociatedWithSession(
 }
 
 export async function addSecret(name: string, value: string): Promise<Secret> {
+  await ensureInitialized();
   const result = await db
     .insert(secrets)
     .values({ name, value })
@@ -99,10 +113,12 @@ export async function addSecret(name: string, value: string): Promise<Secret> {
 }
 
 export async function removeSecret(name: string) {
+  await ensureInitialized();
   await db.delete(secrets).where(eq(secrets.name, name)).returning();
 }
 
 export async function associateSecretWithSession(secretName: string, sessionId: string) {
+  await ensureInitialized();
   const result = await db
     .select({ id: secrets.id })
     .from(secrets)
@@ -123,6 +139,7 @@ export async function associateSecretWithSession(secretName: string, sessionId: 
 }
 
 export async function disassociateSecretWithSession(secretName: string, sessionId: string) {
+  await ensureInitialized();
   const result = await db
     .select({ id: secrets.id })
     .from(secrets)
@@ -147,6 +164,7 @@ export async function disassociateSecretWithSession(secretName: string, sessionI
  * Get MCP client configuration from environment and database
  */
 export async function getMCPConfig(): Promise<MCPClientConfig> {
+  await ensureInitialized();
   // Default MCP configuration
   const mcpConfig: MCPClientConfig = {
     timeout: parseInt(process.env.MCP_TIMEOUT || '30000', 10),
@@ -191,6 +209,7 @@ export async function getMCPConfig(): Promise<MCPClientConfig> {
  * Update MCP configuration in environment
  */
 export async function updateMCPConfig(mcpConfig: Partial<MCPClientConfig>): Promise<void> {
+  await ensureInitialized();
   // This would typically update database configuration
   // For now, we'll just validate the configuration
   if (mcpConfig.servers) {
