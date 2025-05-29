@@ -10,26 +10,14 @@ import { logger, createLogger } from './logger.mjs';
 function parseArgs(): MCPServerConfig {
   const args = process.argv.slice(2);
   const config: MCPServerConfig = {
-    transport: 'stdio',
     port: 3001,
-    logLevel: 'info',
+    logLevel: 'info'
   };
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     
     switch (arg) {
-      case '--transport':
-      case '-t':
-        const transport = args[++i];
-        if (transport === 'stdio' || transport === 'sse') {
-          config.transport = transport;
-        } else {
-          console.error(`Invalid transport: ${transport}. Use 'stdio' or 'sse'.`);
-          process.exit(1);
-        }
-        break;
-        
       case '--port':
       case '-p':
         const port = parseInt(args[++i], 10);
@@ -89,32 +77,33 @@ USAGE:
   peragus-mcp-server [OPTIONS]
 
 OPTIONS:
-  -t, --transport <TYPE>     Transport type: 'stdio' or 'sse' (default: stdio)
-  -p, --port <PORT>          Port for SSE transport (default: 3001)
+  -p, --port <PORT>          Server port (default: 3001)
   -l, --log-level <LEVEL>    Log level: debug, info, warn, error (default: info)
   -d, --srcbooks-dir <DIR>   Custom srcbooks directory path
   -h, --help                 Show this help message
   -v, --version              Show version information
 
 EXAMPLES:
-  # Start with stdio transport (for MCP clients)
+  # Start server on default port
   peragus-mcp-server
 
-  # Start with SSE transport on custom port
-  peragus-mcp-server --transport sse --port 3002
+  # Start server on custom port
+  peragus-mcp-server --port 3002
 
   # Enable debug logging
   peragus-mcp-server --log-level debug
 
+  # Use custom srcbooks directory
+  peragus-mcp-server --srcbooks-dir ~/my-notebooks
+
 DESCRIPTION:
   The Peragus MCP Server exposes TypeScript notebook functionality through the
-  Model Context Protocol (MCP). It provides tools for creating, editing, and
-  executing TypeScript/JavaScript notebooks, as well as resources for accessing
-  example notebooks and templates.
+  Model Context Protocol (MCP) using streamable HTTP transport. It provides tools
+  for creating, editing, and executing TypeScript/JavaScript notebooks, as well
+  as resources for accessing example notebooks and templates.
 
-  When using stdio transport, the server communicates via standard input/output,
-  which is suitable for MCP clients. When using SSE transport, the server runs
-  as an HTTP server with Server-Sent Events support.
+  The server uses streamable HTTP transport for communication, supporting
+  real-time bidirectional communication suitable for web clients and MCP clients.
 `);
 }
 
@@ -158,15 +147,9 @@ async function main(): Promise<void> {
     process.on('SIGINT', () => shutdown('SIGINT'));
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     
-    // Keep the process alive for stdio transport
-    if (config.transport === 'stdio') {
-      // For stdio transport, the server handles the process lifecycle
-      logger.info('MCP Server ready (stdio transport)');
-    } else {
-      logger.info(`MCP Server ready on port ${config.port} (SSE transport)`);
-      // Keep process alive for SSE transport
-      process.stdin.resume();
-    }
+    logger.info(`MCP Server ready on port ${config.port} (streamable HTTP transport)`);
+    // Keep process alive
+    process.stdin.resume();
     
   } catch (error) {
     console.error('Failed to start MCP server:', error);

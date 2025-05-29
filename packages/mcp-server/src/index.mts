@@ -33,7 +33,6 @@ export {
  * Default configuration for the MCP server
  */
 export const DEFAULT_CONFIG = {
-  transport: 'stdio' as const,
   port: 3001,
   logLevel: 'info' as const,
 };

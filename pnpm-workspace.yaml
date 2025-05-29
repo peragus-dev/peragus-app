@@ -8,3 +8,4 @@ catalog:
   ws: '^8.17.0'
   '@ai-sdk/anthropic': '^0.0.49'
   '@ai-sdk/openai': '^0.0.58'
+  '@ai-sdk/google': '^1.0.3'

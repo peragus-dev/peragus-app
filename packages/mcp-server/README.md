@@ -37,11 +37,11 @@ pnpm build
 ### As a Standalone Server
 
 ```bash
-# Start with stdio transport (recommended)
+# Start server on default port 3001
 pnpm start
 
 # Or with custom configuration
-node dist/index.js --transport stdio --log-level info
+node dist/index.js --port 3002 --log-level info
 ```
 
 ### Programmatic Usage
@@ -50,7 +50,6 @@ node dist/index.js --transport stdio --log-level info
 import { startMCPServer } from '@srcbook/mcp-server';
 
 const server = await startMCPServer({
-  transport: 'stdio',
   port: 3001,
   logLevel: 'info',
   srcbooksDir: './notebooks'
@@ -65,8 +64,7 @@ Add to your MCP client configuration:
 {
   "mcpServers": {
     "peragus-notebooks": {
-      "command": "node",
-      "args": ["/path/to/peragus-app/packages/mcp-server/dist/index.js"],
+      "url": "http://localhost:3001/mcp",
       "env": {
         "SRCBOOKS_DIR": "/path/to/your/notebooks"
       }
@@ -81,14 +79,12 @@ Add to your MCP client configuration:
 
 - `SRCBOOKS_DIR` - Directory for storing notebooks (default: `~/.srcbook`)
 - `LOG_LEVEL` - Logging level: `debug`, `info`, `warn`, `error` (default: `info`)
-- `MCP_TRANSPORT` - Transport type: `stdio`, `sse` (default: `stdio`)
-- `MCP_PORT` - Port for SSE transport (default: `3001`)
+- `MCP_PORT` - Port for HTTP server (default: `3001`)
 
 ### Configuration Schema
 
 ```typescript
 interface MCPServerConfig {
-  transport: 'stdio' | 'sse';
   port: number;
   logLevel: 'debug' | 'info' | 'warn' | 'error';
   srcbooksDir?: string;
@@ -213,6 +209,9 @@ The MCP server is built with:
 - **@srcbook/api** - Core notebook functionality
 - **@srcbook/shared** - Shared types and utilities
 - **zod** - Runtime type validation
+- **express** - HTTP server framework
+
+The server uses streamable HTTP transport for bidirectional communication, supporting real-time interactions between MCP clients and the notebook server.
 
 ### Project Structure
 
