@@ -45,4 +45,11 @@ srcbook/lib/**/*
 # Docs folder
 docs/
 
+# Claude Code configuration
+.claude/
+mcp_config_claude_code.json
+
+# Smithery SDK (external dependency)
+smithery-sdk/
+
 vite.config.ts.timestamp-*.mjs

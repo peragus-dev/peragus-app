@@ -1,13 +1,5 @@
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import {
-  CallToolRequestSchema,
-  ListResourcesRequestSchema,
-  ListToolsRequestSchema,
-  ReadResourceRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
-import { z } from 'zod';
 
 import { registerResourceHandlers } from './resources.mjs';
 import { registerToolHandlers } from './tools.mjs';
@@ -60,29 +52,20 @@ export async function startMCPServer(config: MCPServerConfig): Promise<Server> {
   // Validate configuration
   const validatedConfig = MCPServerConfigSchema.parse(config);
   
-  const server = createMCPServer();
-
-  let transport;
+  logger.info('Initializing Peragus MCP server...');
   
-  if (validatedConfig.transport === 'stdio') {
-    transport = new StdioServerTransport();
-  } else if (validatedConfig.transport === 'sse') {
-    // For SSE transport, we need to set up an HTTP server
-    // This is a simplified implementation - in practice you'd want proper HTTP server setup
-    throw new Error('SSE transport not fully implemented yet. Use stdio transport.');
-  } else {
-    throw new Error(`Unsupported transport: ${validatedConfig.transport}`);
-  }
-
-  try {
-    await server.connect(transport);
-    logger.info(`MCP Server started on ${validatedConfig.transport}`);
-    
-    return server;
-  } catch (error) {
-    logger.error('Failed to start MCP server:', error);
-    throw error;
-  }
+  // Create server instance
+  const server = createMCPServer();
+  
+  // Create stdio transport
+  const transport = new StdioServerTransport();
+  
+  // Connect server to transport
+  await server.connect(transport);
+  
+  logger.info('Peragus MCP Server started with stdio transport');
+  
+  return server;
 }
 
 /**
@@ -91,7 +74,7 @@ export async function startMCPServer(config: MCPServerConfig): Promise<Server> {
 export async function shutdownMCPServer(server: Server): Promise<void> {
   try {
     await server.close();
-    logger.info('MCP Server shut down gracefully');
+    logger.info('Peragus MCP Server shut down gracefully');
   } catch (error) {
     logger.error('Error during MCP server shutdown:', error);
     throw error;

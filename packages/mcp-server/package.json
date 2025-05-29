@@ -11,8 +11,8 @@
     "dist/**"
   ],
   "scripts": {
-    "start": "node dist/index.mjs",
-    "dev": "vite-node -w src/cli.mts",
+    "start": "node dist/cli.mjs",
+    "dev": "vite-node src/cli.mts",
     "test": "vitest",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
@@ -24,7 +24,7 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.3.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
     "@peragus/api": "workspace:^",
     "@peragus/shared": "workspace:^",
     "zod": "catalog:"

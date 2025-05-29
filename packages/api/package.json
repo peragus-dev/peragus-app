@@ -4,6 +4,32 @@
   "type": "module",
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    },
+    "./srcbook/index.mjs": {
+      "import": "./dist/api/srcbook/index.mjs",
+      "types": "./dist/api/srcbook/index.d.mts"
+    },
+    "./srcbook/examples.mjs": {
+      "import": "./dist/api/srcbook/examples.mjs",
+      "types": "./dist/api/srcbook/examples.d.mts"
+    },
+    "./srcbook/path.mjs": {
+      "import": "./dist/api/srcbook/path.mjs",
+      "types": "./dist/api/srcbook/path.d.mts"
+    },
+    "./srcmd.mjs": {
+      "import": "./dist/api/srcmd.mjs",
+      "types": "./dist/api/srcmd.d.mts"
+    },
+    "./types.mjs": {
+      "import": "./dist/api/types.mjs",
+      "types": "./dist/api/types.d.mts"
+    }
+  },
   "files": [
     "dist/**"
   ],

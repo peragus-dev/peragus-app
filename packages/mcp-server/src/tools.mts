@@ -5,18 +5,13 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
 
-// @ts-ignore - ignore import errors during build time
-import { createSrcbook, importSrcbookFromSrcmdText } from '@peragus/api/srcbook/index.mjs';
-// @ts-ignore - ignore import errors during build time
-import { encode } from '@peragus/api/srcmd.mjs';
-// @ts-ignore - ignore import errors during build time
-import type { SessionType } from '@peragus/api/types.mjs';
-// @ts-ignore - ignore import errors during build time
-import type { CellType, CodeLanguageType } from '@peragus/shared';
-// @ts-ignore - ignore import errors during build time
-import { randomid, validFilename } from '@peragus/shared';
-
 import { logger } from './logger.mjs';
+import { createSrcbook, importSrcbookFromSrcmdText, importSrcbookFromSrcmdUrl, removeSrcbook, writeToDisk, writeReadmeToDisk, writeCellToDisk } from '@peragus/api/srcbook/index.mjs';
+import { EXAMPLE_SRCBOOKS } from '@peragus/api/srcbook/examples.mjs';
+import { pathToSrcbook } from '@peragus/api/srcbook/path.mjs';
+import { decode } from '@peragus/api/srcmd.mjs';
+import fs from 'node:fs';
+import { randomid } from '@peragus/shared';
 import { 
   TOOL_NAMES,
   ToolResult,
@@ -25,7 +20,6 @@ import {
   InvalidOperationError,
   ExecutionError
 } from './types.mjs';
-import { getNotebookTemplates, createNotebookFromTemplate } from './templates.mjs';
 
 /**
  * Register all tool handlers with the MCP server
@@ -36,7 +30,7 @@ export function registerToolHandlers(server: Server): void {
     const tools = [
       {
         name: TOOL_NAMES.CREATE_NOTEBOOK,
-        description: 'Create a new TypeScript or JavaScript notebook',
+        description: 'Create a new TypeScript or JavaScript notebook using Peragus',
         inputSchema: {
           type: 'object',
           properties: {
@@ -48,55 +42,87 @@ export function registerToolHandlers(server: Server): void {
               type: 'string', 
               enum: ['typescript', 'javascript'],
               description: 'Programming language for the notebook'
-            },
-            description: { 
-              type: 'string', 
-              description: 'Optional description of the notebook' 
-            },
-            templateId: {
-              type: 'string',
-              description: 'Optional template ID to create notebook from template'
-            },
-            tags: { 
-              type: 'array', 
-              items: { type: 'string' },
-              description: 'Optional tags for categorization'
             }
           },
           required: ['title', 'language']
         }
       },
       {
-        name: TOOL_NAMES.EDIT_NOTEBOOK,
-        description: 'Edit an existing notebook by adding, updating, or deleting cells',
+        name: TOOL_NAMES.LIST_NOTEBOOKS,
+        description: 'List example notebooks available in Peragus',
+        inputSchema: {
+          type: 'object',
+          properties: {}
+        }
+      },
+      {
+        name: 'import_notebook',
+        description: 'Import a notebook from text or URL',
         inputSchema: {
           type: 'object',
           properties: {
-            notebookId: { 
-              type: 'string', 
-              description: 'Unique identifier of the notebook to edit' 
+            source: {
+              type: 'string',
+              enum: ['text', 'url'],
+              description: 'Import source type'
+            },
+            content: {
+              type: 'string',
+              description: 'Notebook content (srcmd text) or URL'
+            },
+            title: {
+              type: 'string',
+              description: 'Optional custom title for the notebook'
+            }
+          },
+          required: ['source', 'content']
+        }
+      },
+      {
+        name: 'get_notebook',
+        description: 'Get the content of a specific notebook by ID',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            notebookId: {
+              type: 'string',
+              description: 'Notebook ID (directory name)'
+            }
+          },
+          required: ['notebookId']
+        }
+      },
+      {
+        name: 'update_notebook',
+        description: 'Update a notebook by adding, editing, deleting, or moving cells',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            notebookId: {
+              type: 'string',
+              description: 'Notebook ID (directory name) to update'
             },
             operation: {
               type: 'string',
               enum: ['add_cell', 'edit_cell', 'delete_cell', 'move_cell'],
-              description: 'Type of edit operation to perform'
+              description: 'Type of update operation to perform'
             },
-            cellIndex: { 
-              type: 'number', 
-              description: 'Index position for the cell operation' 
+            cellIndex: {
+              type: 'number',
+              description: 'Index position for the cell operation (0-based)'
             },
             cellType: {
-              type: 'string', 
+              type: 'string',
               enum: ['title', 'markdown', 'code', 'package.json'],
               description: 'Type of cell (required for add_cell operation)'
             },
-            content: { 
-              type: 'string', 
-              description: 'Cell content (required for add_cell and edit_cell operations)' 
+            content: {
+              type: 'string',
+              description: 'Cell content (required for add_cell and edit_cell operations)'
             },
             filename: {
               type: 'string',
-              description: 'Filename for code cells'
+              description: 'Filename for code cells (optional, auto-generated if not provided)'
             },
             newIndex: {
               type: 'number',
@@ -107,120 +133,14 @@ export function registerToolHandlers(server: Server): void {
         }
       },
       {
-        name: TOOL_NAMES.EXECUTE_NOTEBOOK,
-        description: 'Execute code cells in a notebook',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            notebookId: { 
-              type: 'string', 
-              description: 'Unique identifier of the notebook to execute' 
-            },
-            cellIds: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Specific cell IDs to execute (if not provided, executes all code cells)'
-            },
-            timeout: { 
-              type: 'number', 
-              default: 30000,
-              description: 'Execution timeout in milliseconds'
-            }
-          },
-          required: ['notebookId']
-        }
-      },
-      {
-        name: TOOL_NAMES.LIST_NOTEBOOKS,
-        description: 'List available notebooks with filtering options',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            type: {
-              type: 'string',
-              enum: ['user', 'example', 'all'],
-              default: 'all',
-              description: 'Type of notebooks to list'
-            },
-            language: {
-              type: 'string',
-              enum: ['typescript', 'javascript'],
-              description: 'Filter by programming language'
-            },
-            limit: { 
-              type: 'number', 
-              default: 50,
-              description: 'Maximum number of notebooks to return'
-            },
-            offset: {
-              type: 'number',
-              default: 0, 
-              description: 'Offset for pagination'
-            },
-            tags: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Filter by tags'
-            }
-          }
-        }
-      },
-      {
-        name: TOOL_NAMES.GET_NOTEBOOK_CONTENT,
-        description: 'Get the full content of a specific notebook',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            notebookId: { 
-              type: 'string', 
-              description: 'Unique identifier of the notebook' 
-            },
-            format: {
-              type: 'string',
-              enum: ['json', 'markdown', 'srcbook'],
-              default: 'json',
-              description: 'Output format for the notebook content'
-            },
-            includeCellOutputs: {
-              type: 'boolean',
-              default: false,
-              description: 'Whether to include cell execution outputs'
-            }
-          },
-          required: ['notebookId']
-        }
-      },
-      {
-        name: TOOL_NAMES.SAVE_NOTEBOOK,
-        description: 'Save changes to a notebook',
-        inputSchema: {
-          type: 'object', 
-          properties: {
-            notebookId: { 
-              type: 'string', 
-              description: 'Unique identifier of the notebook' 
-            },
-            content: { 
-              type: 'object', 
-              description: 'Updated notebook content' 
-            },
-            message: { 
-              type: 'string', 
-              description: 'Optional save message or comment' 
-            }
-          },
-          required: ['notebookId', 'content']
-        }
-      },
-      {
-        name: TOOL_NAMES.DELETE_NOTEBOOK,
+        name: 'delete_notebook',
         description: 'Delete a notebook permanently',
         inputSchema: {
           type: 'object',
           properties: {
-            notebookId: { 
-              type: 'string', 
-              description: 'Unique identifier of the notebook to delete' 
+            notebookId: {
+              type: 'string',
+              description: 'Notebook ID (directory name) to delete'
             },
             confirm: {
               type: 'boolean',
@@ -228,54 +148,6 @@ export function registerToolHandlers(server: Server): void {
             }
           },
           required: ['notebookId', 'confirm']
-        }
-      },
-      {
-        name: TOOL_NAMES.IMPORT_NOTEBOOK,
-        description: 'Import a notebook from various sources',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            source: {
-              type: 'string',
-              enum: ['file', 'url', 'text'],
-              description: 'Source type for the import'
-            },
-            content: {
-              type: 'string',
-              description: 'File path, URL, or direct content to import'
-            },
-            title: {
-              type: 'string',
-              description: 'Optional title for the imported notebook'
-            }
-          },
-          required: ['source', 'content']
-        }
-      },
-      {
-        name: TOOL_NAMES.EXPORT_NOTEBOOK,
-        description: 'Export a notebook to various formats',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            notebookId: { 
-              type: 'string', 
-              description: 'Unique identifier of the notebook to export' 
-            },
-            format: {
-              type: 'string',
-              enum: ['markdown', 'json', 'srcbook', 'html'],
-              default: 'markdown',
-              description: 'Export format'
-            },
-            includeOutputs: {
-              type: 'boolean',
-              default: true,
-              description: 'Whether to include cell outputs in export'
-            }
-          },
-          required: ['notebookId']
         }
       }
     ];
@@ -298,29 +170,20 @@ export function registerToolHandlers(server: Server): void {
         case TOOL_NAMES.CREATE_NOTEBOOK:
           result = await handleCreateNotebook(args);
           break;
-        case TOOL_NAMES.EDIT_NOTEBOOK:
-          result = await handleEditNotebook(args);
-          break;
-        case TOOL_NAMES.EXECUTE_NOTEBOOK:
-          result = await handleExecuteNotebook(args);
-          break;
         case TOOL_NAMES.LIST_NOTEBOOKS:
           result = await handleListNotebooks(args);
           break;
-        case TOOL_NAMES.GET_NOTEBOOK_CONTENT:
-          result = await handleGetNotebookContent(args);
-          break;
-        case TOOL_NAMES.SAVE_NOTEBOOK:
-          result = await handleSaveNotebook(args);
-          break;
-        case TOOL_NAMES.DELETE_NOTEBOOK:
-          result = await handleDeleteNotebook(args);
-          break;
-        case TOOL_NAMES.IMPORT_NOTEBOOK:
+        case 'import_notebook':
           result = await handleImportNotebook(args);
           break;
-        case TOOL_NAMES.EXPORT_NOTEBOOK:
-          result = await handleExportNotebook(args);
+        case 'get_notebook':
+          result = await handleGetNotebook(args);
+          break;
+        case 'update_notebook':
+          result = await handleUpdateNotebook(args);
+          break;
+        case 'delete_notebook':
+          result = await handleDeleteNotebook(args);
           break;
         default:
           throw new MCPServerError(`Unknown tool: ${toolName}`, 'UNKNOWN_TOOL');
@@ -362,37 +225,22 @@ export function registerToolHandlers(server: Server): void {
  * Handle create notebook tool
  */
 async function handleCreateNotebook(args: any): Promise<ToolResult> {
-  const { title, language, description, templateId, tags } = args;
+  const { title, language } = args;
   
   try {
-    let notebookDir: string;
-    
-    if (templateId) {
-      // Create from template
-      const template = await createNotebookFromTemplate(templateId, title);
-      if (!template) {
-        throw new NotebookNotFoundError(templateId);
-      }
-      
-      // For now, create a basic notebook and let the user customize it
-      // TODO: Implement proper template conversion
-      notebookDir = await createSrcbook(title, template.language as CodeLanguageType);
-    } else {
-      // Create new notebook
-      notebookDir = await createSrcbook(title, language as CodeLanguageType);
-    }
+    const srcbookDir = await createSrcbook(title, language);
+    const notebookId = srcbookDir.split('/').pop() || '';
     
     return {
       success: true,
       data: {
-        notebookId: notebookDir.split('/').pop(),
-        directory: notebookDir,
+        notebookId,
         title,
         language,
-        description,
-        tags
+        srcbookDir,
+        createdAt: new Date().toISOString()
       },
-      message: `Successfully created notebook: ${title}`
+      message: `Successfully created Peragus notebook: ${title} at ${srcbookDir}`
     };
   } catch (error) {
     throw new MCPServerError(
@@ -404,113 +252,256 @@ async function handleCreateNotebook(args: any): Promise<ToolResult> {
 }
 
 /**
- * Handle edit notebook tool
- */
-async function handleEditNotebook(args: any): Promise<ToolResult> {
-  const { notebookId, operation, cellIndex, cellType, content, filename, newIndex } = args;
-  
-  // TODO: Implement notebook editing logic
-  // This would integrate with the existing session management and cell operations
-  
-  return {
-    success: true,
-    message: `Notebook edit operation '${operation}' completed`,
-    data: {
-      notebookId,
-      operation,
-      cellIndex
-    }
-  };
-}
-
-/**
- * Handle execute notebook tool
- */
-async function handleExecuteNotebook(args: any): Promise<ToolResult> {
-  const { notebookId, cellIds, timeout = 30000 } = args;
-  
-  // TODO: Implement notebook execution logic
-  // This would integrate with the existing TypeScript server and execution engine
-  
-  return {
-    success: true,
-    message: `Notebook execution completed`,
-    data: {
-      notebookId,
-      executedCells: cellIds || 'all',
-      timeout
-    }
-  };
-}
-
-/**
- * Handle list notebooks tool
+ * Handle list notebooks tool (shows example notebooks)
  */
 async function handleListNotebooks(args: any): Promise<ToolResult> {
-  const { type = 'all', language, limit = 50, offset = 0, tags } = args;
+  try {
+    const examples = EXAMPLE_SRCBOOKS.map(example => ({
+      id: example.id,
+      title: example.title,
+      description: example.description,
+      language: example.language,
+      tags: example.tags,
+      path: example.path
+    }));
+    
+    return {
+      success: true,
+      data: {
+        examples,
+        total: examples.length
+      },
+      message: `Found ${examples.length} example notebooks`
+    };
+  } catch (error) {
+    throw new MCPServerError(
+      `Failed to list notebooks: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'LIST_NOTEBOOKS_ERROR',
+      error
+    );
+  }
+}
+
+/**
+ * Handle import notebook tool
+ */
+async function handleImportNotebook(args: any): Promise<ToolResult> {
+  const { source, content, title } = args;
   
-  // TODO: Implement notebook listing logic
-  // This would query the file system and/or database for notebooks
-  
-  const notebooks = [
-    {
-      id: 'example-1',
-      title: 'Getting Started',
-      language: 'typescript',
-      type: 'example',
-      tags: ['tutorial', 'basics']
+  try {
+    let srcbookDir: string;
+    
+    if (source === 'url') {
+      srcbookDir = await importSrcbookFromSrcmdUrl(content, title);
+    } else if (source === 'text') {
+      srcbookDir = await importSrcbookFromSrcmdText(content, title);
+    } else {
+      throw new InvalidOperationError('import_notebook', `Invalid source type: ${source}`);
     }
-  ];
-  
-  return {
-    success: true,
-    data: {
-      notebooks,
-      total: notebooks.length,
-      limit,
-      offset
-    },
-    message: `Found ${notebooks.length} notebooks`
-  };
+    
+    const notebookId = srcbookDir.split('/').pop() || '';
+    
+    return {
+      success: true,
+      data: {
+        notebookId,
+        srcbookDir,
+        source,
+        importedAt: new Date().toISOString()
+      },
+      message: `Successfully imported notebook from ${source} to ${srcbookDir}`
+    };
+  } catch (error) {
+    throw new MCPServerError(
+      `Failed to import notebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'IMPORT_NOTEBOOK_ERROR',
+      error
+    );
+  }
 }
 
 /**
- * Handle get notebook content tool
+ * Handle get notebook tool
  */
-async function handleGetNotebookContent(args: any): Promise<ToolResult> {
-  const { notebookId, format = 'json', includeCellOutputs = false } = args;
+async function handleGetNotebook(args: any): Promise<ToolResult> {
+  const { notebookId } = args;
   
-  // TODO: Implement notebook content retrieval
-  // This would load the notebook from the file system
-  
-  return {
-    success: true,
-    data: {
-      notebookId,
-      format,
-      content: `Notebook content for ${notebookId}`
-    },
-    message: `Retrieved notebook content in ${format} format`
-  };
+  try {
+    const srcbookDir = pathToSrcbook(notebookId);
+    
+    // Check if notebook exists
+    if (!await fs.promises.access(srcbookDir).then(() => true).catch(() => false)) {
+      throw new NotebookNotFoundError(notebookId);
+    }
+    
+    // Read the README.md file which contains the notebook content
+    const readmePath = `${srcbookDir}/README.md`;
+    const readmeContent = await fs.promises.readFile(readmePath, 'utf8');
+    
+    // Decode the srcmd content
+    const result = decode(readmeContent);
+    if (result.error) {
+      throw new MCPServerError(`Failed to decode notebook: ${result.error}`, 'DECODE_ERROR');
+    }
+    
+    return {
+      success: true,
+      data: {
+        notebookId,
+        srcbookDir,
+        title: result.srcbook.cells.find(cell => cell.type === 'title')?.text || 'Untitled',
+        language: result.srcbook.language,
+        cells: result.srcbook.cells,
+        cellCount: result.srcbook.cells.length
+      },
+      message: `Retrieved notebook ${notebookId}`
+    };
+  } catch (error) {
+    if (error instanceof NotebookNotFoundError) {
+      throw error;
+    }
+    throw new MCPServerError(
+      `Failed to get notebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'GET_NOTEBOOK_ERROR',
+      error
+    );
+  }
 }
 
 /**
- * Handle save notebook tool
+ * Handle update notebook tool
  */
-async function handleSaveNotebook(args: any): Promise<ToolResult> {
-  const { notebookId, content, message } = args;
+async function handleUpdateNotebook(args: any): Promise<ToolResult> {
+  const { notebookId, operation, cellIndex, cellType, content, filename, newIndex } = args;
   
-  // TODO: Implement notebook saving logic
-  // This would persist changes to the file system
-  
-  return {
-    success: true,
-    data: {
-      notebookId,
-      savedAt: new Date().toISOString()
-    },
-    message: message || `Notebook ${notebookId} saved successfully`
-  };
+  try {
+    const srcbookDir = pathToSrcbook(notebookId);
+    
+    // Check if notebook exists
+    if (!await fs.promises.access(srcbookDir).then(() => true).catch(() => false)) {
+      throw new NotebookNotFoundError(notebookId);
+    }
+    
+    // Read current notebook content
+    const readmePath = `${srcbookDir}/README.md`;
+    const readmeContent = await fs.promises.readFile(readmePath, 'utf8');
+    const result = decode(readmeContent);
+    if (result.error) {
+      throw new MCPServerError(`Failed to decode notebook: ${result.error}`, 'DECODE_ERROR');
+    }
+    
+    const cells = [...result.srcbook.cells];
+    const language = result.srcbook.language;
+    let operationDetails = '';
+    
+    switch (operation) {
+      case 'add_cell':
+        if (!cellType || content === undefined) {
+          throw new InvalidOperationError('add_cell', 'cellType and content are required');
+        }
+        
+        const newCell: any = {
+          id: randomid(),
+          type: cellType,
+        };
+        
+        if (cellType === 'title') {
+          newCell.text = content;
+        } else if (cellType === 'markdown') {
+          newCell.text = content;
+        } else if (cellType === 'code') {
+          newCell.source = content;
+          newCell.filename = filename || `code-${newCell.id}.${language === 'typescript' ? 'ts' : 'js'}`;
+          newCell.status = 'idle';
+        } else if (cellType === 'package.json') {
+          newCell.source = content;
+          newCell.filename = 'package.json';
+          newCell.status = 'idle';
+        }
+        
+        const insertIndex = cellIndex !== undefined && cellIndex >= 0 && cellIndex <= cells.length ? cellIndex : cells.length;
+        cells.splice(insertIndex, 0, newCell);
+        operationDetails = `Added ${cellType} cell at index ${insertIndex}`;
+        break;
+        
+      case 'edit_cell':
+        if (cellIndex === undefined || content === undefined) {
+          throw new InvalidOperationError('edit_cell', 'cellIndex and content are required');
+        }
+        if (cellIndex < 0 || cellIndex >= cells.length) {
+          throw new InvalidOperationError('edit_cell', `Invalid cell index: ${cellIndex}`);
+        }
+        
+        const cell = cells[cellIndex];
+        if (cell.type === 'title' || cell.type === 'markdown') {
+          cell.text = content;
+        } else if (cell.type === 'code' || cell.type === 'package.json') {
+          cell.source = content;
+          if (filename) {
+            cell.filename = filename;
+          }
+        }
+        operationDetails = `Edited ${cell.type} cell at index ${cellIndex}`;
+        break;
+        
+      case 'delete_cell':
+        if (cellIndex === undefined) {
+          throw new InvalidOperationError('delete_cell', 'cellIndex is required');
+        }
+        if (cellIndex < 0 || cellIndex >= cells.length) {
+          throw new InvalidOperationError('delete_cell', `Invalid cell index: ${cellIndex}`);
+        }
+        
+        const deletedCell = cells.splice(cellIndex, 1)[0];
+        operationDetails = `Deleted ${deletedCell.type} cell from index ${cellIndex}`;
+        break;
+        
+      case 'move_cell':
+        if (cellIndex === undefined || newIndex === undefined) {
+          throw new InvalidOperationError('move_cell', 'cellIndex and newIndex are required');
+        }
+        if (cellIndex < 0 || cellIndex >= cells.length || newIndex < 0 || newIndex >= cells.length) {
+          throw new InvalidOperationError('move_cell', 'Invalid cell indices');
+        }
+        
+        const [movedCell] = cells.splice(cellIndex, 1);
+        cells.splice(newIndex, 0, movedCell);
+        operationDetails = `Moved ${movedCell.type} cell from index ${cellIndex} to ${newIndex}`;
+        break;
+        
+      default:
+        throw new InvalidOperationError('update_notebook', `Unknown operation: ${operation}`);
+    }
+    
+    // Write updated notebook back to disk
+    await writeToDisk({
+      dir: srcbookDir,
+      cells,
+      language,
+      'tsconfig.json': language === 'typescript' ? result.srcbook['tsconfig.json'] : undefined
+    });
+    
+    return {
+      success: true,
+      data: {
+        notebookId,
+        operation,
+        operationDetails,
+        cellCount: cells.length,
+        updatedAt: new Date().toISOString()
+      },
+      message: `Notebook updated successfully: ${operationDetails}`
+    };
+  } catch (error) {
+    if (error instanceof NotebookNotFoundError || error instanceof InvalidOperationError) {
+      throw error;
+    }
+    throw new MCPServerError(
+      `Failed to update notebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'UPDATE_NOTEBOOK_ERROR',
+      error
+    );
+  }
 }
 
 /**
@@ -523,78 +514,48 @@ async function handleDeleteNotebook(args: any): Promise<ToolResult> {
     throw new InvalidOperationError('delete_notebook', 'Confirmation required for deletion');
   }
   
-  // TODO: Implement notebook deletion logic
-  // This would remove the notebook directory and files
-  
-  return {
-    success: true,
-    data: {
-      notebookId,
-      deletedAt: new Date().toISOString()
-    },
-    message: `Notebook ${notebookId} deleted successfully`
-  };
-}
-
-/**
- * Handle import notebook tool
- */
-async function handleImportNotebook(args: any): Promise<ToolResult> {
-  const { source, content, title } = args;
-  
   try {
-    let notebookDir: string;
+    const srcbookDir = pathToSrcbook(notebookId);
     
-    switch (source) {
-      case 'text':
-        notebookDir = await importSrcbookFromSrcmdText(content, title);
-        break;
-      case 'file':
-        // TODO: Implement file import
-        throw new MCPServerError('File import not yet implemented', 'NOT_IMPLEMENTED');
-      case 'url':
-        // TODO: Implement URL import
-        throw new MCPServerError('URL import not yet implemented', 'NOT_IMPLEMENTED');
-      default:
-        throw new InvalidOperationError('import_notebook', `Unsupported source type: ${source}`);
+    // Check if notebook exists
+    if (!await fs.promises.access(srcbookDir).then(() => true).catch(() => false)) {
+      throw new NotebookNotFoundError(notebookId);
     }
+    
+    // Get title before deletion
+    let title = 'Unknown';
+    try {
+      const readmePath = `${srcbookDir}/README.md`;
+      const readmeContent = await fs.promises.readFile(readmePath, 'utf8');
+      const result = decode(readmeContent);
+      if (!result.error) {
+        title = result.srcbook.cells.find(cell => cell.type === 'title')?.text || 'Untitled';
+      }
+    } catch {
+      // Ignore errors reading title
+    }
+    
+    // Delete the notebook
+    await removeSrcbook(srcbookDir);
     
     return {
       success: true,
       data: {
-        notebookId: notebookDir.split('/').pop(),
-        directory: notebookDir,
-        source,
-        title
+        notebookId,
+        title,
+        srcbookDir,
+        deletedAt: new Date().toISOString()
       },
-      message: `Successfully imported notebook from ${source}`
+      message: `Notebook '${title}' (${notebookId}) deleted successfully`
     };
   } catch (error) {
+    if (error instanceof NotebookNotFoundError || error instanceof InvalidOperationError) {
+      throw error;
+    }
     throw new MCPServerError(
-      `Failed to import notebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      'IMPORT_NOTEBOOK_ERROR',
+      `Failed to delete notebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'DELETE_NOTEBOOK_ERROR',
       error
     );
   }
-}
-
-/**
- * Handle export notebook tool
- */
-async function handleExportNotebook(args: any): Promise<ToolResult> {
-  const { notebookId, format = 'markdown', includeOutputs = true } = args;
-  
-  // TODO: Implement notebook export logic
-  // This would convert the notebook to the requested format
-  
-  return {
-    success: true,
-    data: {
-      notebookId,
-      format,
-      exportedAt: new Date().toISOString(),
-      content: `Exported content for ${notebookId} in ${format} format`
-    },
-    message: `Notebook exported successfully in ${format} format`
-  };
 }
