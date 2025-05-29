@@ -1,16 +1,12 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { MCPClientManager } from './client.mjs';
 import { 
-  TransportAdapterFactory, 
-  type TransportAdapter,
   type TransportPluginConfig 
 } from './transport/adapter.mjs';
 import { 
-  type MCPClientConfig, 
-  type MCPServerConfig, 
-  type MCPConnection 
+  type MCPClientConfig,
+  type MCPTool,
+  type MCPResource
 } from './types.mjs';
-import { ConfigCache, ConfigTransformer } from './smithery/config.mjs';
 
 /**
  * Enhanced MCP Client Configuration
@@ -38,132 +34,36 @@ interface ConnectionMetrics {
   transportMetadata: any;
 }
 
-/**
- * Enhanced MCP Connection with metrics and adapter
- */
-interface EnhancedMCPConnection extends MCPConnection {
-  adapter: TransportAdapter;
-  metrics: ConnectionMetrics;
-}
 
 /**
  * Enhanced MCP Client Manager
- * Extends the base client with Smithery features while maintaining backward compatibility
+ * Wraps the base client with Smithery features while maintaining backward compatibility
  */
-export class EnhancedMCPClientManager extends MCPClientManager {
+export class EnhancedMCPClientManager {
+  private baseClient: MCPClientManager;
   private enhancedConfig: EnhancedMCPClientConfig;
-  private configCache?: ConfigCache;
-  private enhancedConnections = new Map<string, EnhancedMCPConnection>();
+  private enhancedConnections = new Map<string, any>();
   
   constructor(config: EnhancedMCPClientConfig) {
-    super(config);
+    this.baseClient = new MCPClientManager(config);
     this.enhancedConfig = config;
     
-    // Initialize config cache if enabled
-    if (config.experimental?.configCache) {
-      this.configCache = new ConfigCache(config.experimental.configCacheTTL);
-    }
   }
   
   /**
-   * Create a connection using the enhanced adapter system
+   * Delegate to base client for listing tools
    */
-  protected async createConnection(serverConfig: MCPServerConfig): Promise<MCPConnection> {
-    // Check cache first
-    const cacheKey = JSON.stringify(serverConfig);
-    const cachedConfig = this.configCache?.get(cacheKey);
-    
-    let processedConfig = serverConfig;
-    if (cachedConfig) {
-      processedConfig = cachedConfig as MCPServerConfig;
-    } else {
-      // Transform config if needed
-      if (this.enhancedConfig.plugins?.transport?.smithery?.enabled) {
-        processedConfig = ConfigTransformer.toSmithery(serverConfig) as MCPServerConfig;
-      }
-      this.configCache?.set(cacheKey, processedConfig);
-    }
-    
-    // Create transport adapter
-    const adapter = TransportAdapterFactory.create(
-      processedConfig,
-      this.enhancedConfig.plugins?.transport
-    );
-    
-    const transport = await adapter.create();
-    
-    // Create client
-    const client = new Client({
-      name: 'peragus-notebook-client',
-      version: '2.0.0' // Bumped version for enhanced client
-    }, {
-      capabilities: {
-        tools: {},
-        resources: { subscribe: true }
-      }
-    });
-    
-    await client.connect(transport);
-    
-    // Create enhanced connection
-    const enhancedConnection: EnhancedMCPConnection = {
-      client,
-      transport,
-      serverId: serverConfig.name,
-      isConnected: () => true, // Will be managed by connection monitor
-      close: async () => {
-        await adapter.dispose();
-        await client.close();
-      },
-      adapter,
-      metrics: {
-        createdAt: new Date(),
-        lastUsedAt: new Date(),
-        requestCount: 0,
-        errorCount: 0,
-        averageResponseTime: 0,
-        transportMetadata: adapter.getMetadata()
-      }
-    };
-    
-    // Store enhanced connection
-    this.enhancedConnections.set(serverConfig.name, enhancedConnection);
-    
-    // Set up connection monitoring
-    this.setupConnectionMonitoring(enhancedConnection);
-    
-    return enhancedConnection;
+  async listTools(): Promise<MCPTool[]> {
+    return this.baseClient.listTools();
   }
   
   /**
-   * Set up connection health monitoring
+   * Delegate to base client for listing resources
    */
-  private setupConnectionMonitoring(connection: EnhancedMCPConnection): void {
-    let isConnected = true;
-    
-    // Override isConnected to use our monitoring
-    connection.isConnected = () => isConnected;
-    
-    // Monitor connection health
-    const checkInterval = setInterval(async () => {
-      try {
-        // Simple health check - list tools
-        await connection.client.listTools();
-        isConnected = true;
-      } catch (error) {
-        isConnected = false;
-        console.warn(`Connection ${connection.serverId} health check failed:`, error);
-      }
-    }, 30000); // Check every 30 seconds
-    
-    // Clean up on close
-    const originalClose = connection.close;
-    connection.close = async () => {
-      clearInterval(checkInterval);
-      await originalClose();
-      this.enhancedConnections.delete(connection.serverId);
-    };
+  async listResources(): Promise<MCPResource[]> {
+    return this.baseClient.listResources();
   }
+  
   
   /**
    * Get enhanced connection metrics
@@ -209,6 +109,39 @@ export class EnhancedMCPClientManager extends MCPClientManager {
   }
   
   /**
+   * Initialize the enhanced client
+   */
+  async initialize(): Promise<void> {
+    // First, let the base client create the connections
+    await this.baseClient.initialize();
+    
+    // Then enhance them with our features
+    // Note: Since we can't access parent's private connections,
+    // we'll track enhanced features separately
+    for (const serverConfig of this.enhancedConfig.servers) {
+      try {
+        // Create enhanced metadata for the connection
+        const enhancedMetadata = {
+          serverId: serverConfig.name,
+          metrics: {
+            createdAt: new Date(),
+            lastUsedAt: new Date(),
+            requestCount: 0,
+            errorCount: 0,
+            averageResponseTime: 0,
+            transportMetadata: {}
+          }
+        };
+        
+        // Store enhanced metadata
+        this.enhancedConnections.set(serverConfig.name, enhancedMetadata);
+      } catch (error) {
+        console.error(`Failed to enhance connection for ${serverConfig.name}:`, error);
+      }
+    }
+  }
+  
+  /**
    * Override callTool to add metrics collection
    */
   async callTool(
@@ -219,7 +152,7 @@ export class EnhancedMCPClientManager extends MCPClientManager {
     const startTime = Date.now();
     
     try {
-      const result = await super.callTool(serverId, toolName, args);
+      const result = await this.baseClient.callTool(serverId, toolName, args);
       
       if (this.enhancedConfig.experimental?.metricsCollection) {
         this.updateMetrics(serverId, Date.now() - startTime);
@@ -234,12 +167,6 @@ export class EnhancedMCPClientManager extends MCPClientManager {
     }
   }
   
-  /**
-   * Get transport adapter for a connection
-   */
-  getTransportAdapter(serverId: string): TransportAdapter | undefined {
-    return this.enhancedConnections.get(serverId)?.adapter;
-  }
   
   /**
    * Enable/disable Smithery features at runtime
@@ -298,7 +225,7 @@ export const defaultEnhancedMCPConfig: EnhancedMCPClientConfig = {
     {
       name: 'peragus-notebook-server',
       transport: 'http',
-      url: 'http://localhost:3001'
+      url: 'http://localhost:3001/mcp'
     }
   ],
   plugins: {

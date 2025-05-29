@@ -5,12 +5,12 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 
 import { logger } from './logger.mjs';
+import { notebookStorage } from './storage.mjs';
 import { 
   RESOURCE_URI_PATTERNS, 
   NotebookNotFoundError,
   MCPServerError 
 } from './types.mjs';
-import { getNotebookTemplates } from './templates.mjs';
 
 /**
  * Register all resource handlers with the MCP server
@@ -21,29 +21,14 @@ export function registerResourceHandlers(server: Server): void {
     try {
       const resources = [];
 
-      // Add example notebooks as resources
-      const examples = await getExampleNotebooks();
-      for (const example of examples) {
-        resources.push({
-          uri: `${RESOURCE_URI_PATTERNS.NOTEBOOK_EXAMPLES}${example.id}`,
-          name: example.title,
-          description: example.description || `Example ${example.language} notebook`,
-          mimeType: 'application/x-srcbook',
-          annotations: {
-            audience: ['user', 'assistant'],
-            priority: getPriorityForExample(example),
-          },
-        });
-      }
-
       // Add user notebooks as resources
-      const userNotebooks = await getUserNotebooks();
-      for (const notebook of userNotebooks) {
+      const notebooks = await notebookStorage.listNotebooks();
+      for (const notebook of notebooks) {
         resources.push({
           uri: `${RESOURCE_URI_PATTERNS.NOTEBOOK_USER}${notebook.id}`,
           name: notebook.title || 'Untitled Notebook',
-          description: `User ${notebook.language} notebook`,
-          mimeType: 'application/x-srcbook',
+          description: `${notebook.language} notebook with ${notebook.cells.length} cells`,
+          mimeType: 'application/json',
           annotations: {
             audience: ['user', 'assistant'],
             priority: 1,
@@ -51,16 +36,16 @@ export function registerResourceHandlers(server: Server): void {
         });
       }
 
-      // Add notebook templates as resources
-      const templates = await getNotebookTemplates();
-      for (const template of templates) {
+      // Add example notebooks as resources
+      const examples = getExampleNotebooks();
+      for (const example of examples) {
         resources.push({
-          uri: `${RESOURCE_URI_PATTERNS.TEMPLATE_NOTEBOOK}${template.id}`,
-          name: template.name,
-          description: template.description,
-          mimeType: 'application/x-srcbook-template',
+          uri: `${RESOURCE_URI_PATTERNS.NOTEBOOK_EXAMPLES}${example.id}`,
+          name: example.title,
+          description: example.description || `Example ${example.language} notebook`,
+          mimeType: 'application/json',
           annotations: {
-            audience: ['assistant'],
+            audience: ['user', 'assistant'],
             priority: 2,
           },
         });
@@ -81,57 +66,32 @@ export function registerResourceHandlers(server: Server): void {
     try {
       logger.debug(`Reading resource: ${uri}`);
 
-      if (uri.startsWith(RESOURCE_URI_PATTERNS.NOTEBOOK_EXAMPLES)) {
+      if (uri.startsWith(RESOURCE_URI_PATTERNS.NOTEBOOK_USER)) {
         const notebookId = extractIdFromURI(uri);
-        const notebook = await getExampleNotebook(notebookId);
-        
-        if (!notebook) {
-          throw new NotebookNotFoundError(notebookId);
-        }
-        
-        const content = serializeNotebook(notebook);
+        const notebook = await notebookStorage.readNotebook(notebookId);
         
         return {
           contents: [{
             uri,
-            mimeType: 'application/x-srcbook',
-            text: content,
+            mimeType: 'application/json',
+            text: JSON.stringify(notebook, null, 2),
           }],
         };
       } 
-      else if (uri.startsWith(RESOURCE_URI_PATTERNS.NOTEBOOK_USER)) {
+      else if (uri.startsWith(RESOURCE_URI_PATTERNS.NOTEBOOK_EXAMPLES)) {
         const notebookId = extractIdFromURI(uri);
-        const notebook = await getUserNotebook(notebookId);
+        const examples = getExampleNotebooks();
+        const example = examples.find(ex => ex.id === notebookId);
         
-        if (!notebook) {
+        if (!example) {
           throw new NotebookNotFoundError(notebookId);
         }
         
-        const content = serializeNotebook(notebook);
-        
         return {
           contents: [{
             uri,
-            mimeType: 'application/x-srcbook',
-            text: content,
-          }],
-        };
-      }
-      else if (uri.startsWith(RESOURCE_URI_PATTERNS.TEMPLATE_NOTEBOOK)) {
-        const templateId = extractIdFromURI(uri);
-        const template = await getNotebookTemplate(templateId);
-        
-        if (!template) {
-          throw new NotebookNotFoundError(templateId);
-        }
-        
-        const content = serializeTemplate(template);
-        
-        return {
-          contents: [{
-            uri,
-            mimeType: 'application/x-srcbook-template',
-            text: content,
+            mimeType: 'application/json',
+            text: JSON.stringify(example, null, 2),
           }],
         };
       }
@@ -140,7 +100,7 @@ export function registerResourceHandlers(server: Server): void {
       }
     } catch (error) {
       logger.error(`Error reading resource ${uri}:`, error);
-      if (error instanceof MCPServerError) {
+      if (error instanceof MCPServerError || error instanceof NotebookNotFoundError) {
         throw error;
       }
       throw new MCPServerError(`Failed to read resource: ${uri}`, 'RESOURCE_READ_ERROR', error);
@@ -149,101 +109,75 @@ export function registerResourceHandlers(server: Server): void {
 }
 
 /**
- * Get all example notebooks (simplified implementation)
+ * Get example notebooks (static examples for demonstration)
  */
-async function getExampleNotebooks() {
-  // Simplified example notebooks - in real implementation would load from EXAMPLE_SRCBOOKS
+function getExampleNotebooks() {
   return [
     {
-      id: 'getting-started',
+      id: 'getting-started-ts',
       title: 'Getting Started with TypeScript',
-      description: 'Learn the basics of TypeScript notebooks',
-      language: 'typescript',
-      tags: ['tutorial', 'basics'],
-      content: {
-        cells: [
-          { type: 'title', text: 'Getting Started with TypeScript' },
-          { type: 'markdown', source: '# Welcome to TypeScript notebooks!' },
-          { type: 'code', source: 'console.log("Hello, TypeScript!");', filename: 'hello.ts' }
-        ],
-        language: 'typescript'
-      }
-    }
-  ];
-}
-
-/**
- * Get all user notebooks (simplified implementation)
- */
-async function getUserNotebooks() {
-  // Simplified implementation - in real version would scan SRCBOOKS_DIR
-  return [
+      description: 'Learn the basics of TypeScript in notebooks',
+      language: 'typescript' as const,
+      cells: [
+        {
+          id: 'cell_title',
+          type: 'title' as const,
+          content: 'Getting Started with TypeScript'
+        },
+        {
+          id: 'cell_intro',
+          type: 'markdown' as const,
+          content: '# Welcome to TypeScript Notebooks!\n\nThis is an interactive TypeScript environment where you can write and execute code.'
+        },
+        {
+          id: 'cell_hello',
+          type: 'code' as const,
+          content: 'console.log("Hello, TypeScript!");\nconst message: string = "Welcome to Peragus!";\nconsole.log(message);',
+          filename: 'hello.ts'
+        },
+        {
+          id: 'cell_types',
+          type: 'code' as const,
+          content: '// TypeScript types in action\ninterface User {\n  name: string;\n  age: number;\n}\n\nconst user: User = {\n  name: "Alice",\n  age: 30\n};\n\nconsole.log(`User: ${user.name}, Age: ${user.age}`);',
+          filename: 'types.ts'
+        }
+      ],
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z'
+    },
     {
-      id: 'user-notebook-1',
-      title: 'My First Notebook',
-      language: 'typescript',
-      openedAt: Date.now()
+      id: 'getting-started-js',
+      title: 'Getting Started with JavaScript',
+      description: 'Learn the basics of JavaScript in notebooks',
+      language: 'javascript' as const,
+      cells: [
+        {
+          id: 'cell_title',
+          type: 'title' as const,
+          content: 'Getting Started with JavaScript'
+        },
+        {
+          id: 'cell_intro',
+          type: 'markdown' as const,
+          content: '# Welcome to JavaScript Notebooks!\n\nThis is an interactive JavaScript environment.'
+        },
+        {
+          id: 'cell_hello',
+          type: 'code' as const,
+          content: 'console.log("Hello, JavaScript!");\nconst message = "Welcome to Peragus!";\nconsole.log(message);',
+          filename: 'hello.js'
+        },
+        {
+          id: 'cell_functions',
+          type: 'code' as const,
+          content: '// JavaScript functions\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n\nconst greeting = greet("World");\nconsole.log(greeting);',
+          filename: 'functions.js'
+        }
+      ],
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z'
     }
   ];
-}
-
-/**
- * Get a specific example notebook
- */
-async function getExampleNotebook(notebookId: string) {
-  const examples = await getExampleNotebooks();
-  return examples.find(example => example.id === notebookId);
-}
-
-/**
- * Get a specific user notebook
- */
-async function getUserNotebook(notebookId: string) {
-  const userNotebooks = await getUserNotebooks();
-  return userNotebooks.find(notebook => notebook.id === notebookId);
-}
-
-/**
- * Get a specific notebook template
- */
-async function getNotebookTemplate(templateId: string) {
-  const templates = await getNotebookTemplates();
-  return templates.find((template: any) => template.id === templateId);
-}
-
-/**
- * Serialize notebook to string format
- */
-function serializeNotebook(notebook: any): string {
-  try {
-    if (notebook.content) {
-      // For example notebooks with content
-      return JSON.stringify(notebook.content, null, 2);
-    } else {
-      // For session notebooks
-      return JSON.stringify({ 
-        id: notebook.id,
-        title: notebook.title,
-        language: notebook.language,
-        cells: notebook.cells || []
-      }, null, 2);
-    }
-  } catch (error) {
-    logger.error('Error serializing notebook:', error);
-    return JSON.stringify(notebook, null, 2);
-  }
-}
-
-/**
- * Serialize template to string format
- */
-function serializeTemplate(template: any): string {
-  try {
-    return JSON.stringify(template, null, 2);
-  } catch (error) {
-    logger.error('Error serializing template:', error);
-    return JSON.stringify(template);
-  }
 }
 
 /**
@@ -252,21 +186,4 @@ function serializeTemplate(template: any): string {
 function extractIdFromURI(uri: string): string {
   const parts = uri.split('/');
   return parts[parts.length - 1];
-}
-
-/**
- * Get priority for example notebook (higher priority = more important)
- */
-function getPriorityForExample(example: any): number {
-  // Prioritize getting started examples
-  if (example.id === 'getting-started' || example.title.toLowerCase().includes('getting started')) {
-    return 3;
-  }
-  
-  // Prioritize TypeScript examples
-  if (example.language === 'typescript') {
-    return 2;
-  }
-  
-  return 1;
 }

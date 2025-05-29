@@ -1,179 +1,293 @@
 # Peragus MCP Server
 
-A Model Context Protocol (MCP) server that provides TypeScript notebook functionality for AI assistants and other MCP clients.
-
-## Overview
-
-This MCP server exposes Peragus TypeScript notebook operations as standardized MCP tools and resources, allowing AI assistants to create, execute, and manage TypeScript notebooks programmatically.
+A Model Context Protocol (MCP) server that provides TypeScript notebook functionality to AI assistants and other MCP clients.
 
 ## Features
 
-### Tools
-- **create_notebook** - Create new TypeScript notebooks
-- **execute_cell** - Execute TypeScript code cells
-- **add_cell** - Add new cells to notebooks
-- **update_cell** - Update existing cell content
-- **delete_cell** - Remove cells from notebooks
-- **save_notebook** - Save notebooks to disk
-- **import_notebook** - Import existing notebooks
-- **generate_notebook** - AI-powered notebook generation
+- **CRUD Operations**: Create, read, update, and delete TypeScript/JavaScript notebooks
+- **Code Execution**: Execute notebook cells with timeout and error handling
+- **File-based Storage**: Stores notebooks as JSON files in `~/.peragus-mcp/notebooks/`
+- **Protocol Version 2025-03-26**: Uses the latest MCP protocol with stdio transport
+- **Standalone Operation**: No database dependencies, runs independently
 
-### Resources
-- **notebook://list** - List all available notebooks
-- **notebook://read/{id}** - Read specific notebook content
-- **notebook://export/{id}** - Export notebook in various formats
-- **notebook://examples** - List example notebooks
+## Quick Setup
+
+### For Demo/Development
+
+The fastest way to get started:
+
+1. **Start Peragus dev server**:
+   ```bash
+   cd /path/to/peragus-app
+   pnpm dev
+   ```
+
+2. **Connect MCP client** using this config:
+   ```json
+   {
+     "mcpServers": {
+       "peragus-notebooks": {
+         "command": "node",
+         "args": ["/path/to/peragus-app/packages/mcp-server/dist/cli.mjs"],
+         "env": {}
+       }
+     }
+   }
+   ```
+
+### For Production
+
+Use Docker for a complete deployment:
+
+```bash
+# In the peragus-app directory
+docker build -t peragus-app .
+docker run -d --name peragus -p 5173:5173 -p 2150:2150 -v ~/.peragus:/root/.peragus peragus-app
+```
 
 ## Installation
 
 ```bash
-cd packages/mcp-server
-pnpm install
-pnpm build
+# Install from the monorepo
+pnpm -F @peragus/mcp-server build
+
+# Or install globally (when published)
+npm install -g @peragus/mcp-server
 ```
 
 ## Usage
 
-### As a Standalone Server
+### Command Line Interface
 
 ```bash
-# Start server on default port 3001
-pnpm start
+# Start with default settings
+peragus-mcp-server
 
-# Or with custom configuration
-node dist/index.js --port 3002 --log-level info
-```
+# Enable debug logging
+peragus-mcp-server --log-level debug
 
-### Programmatic Usage
+# Use custom storage directory
+peragus-mcp-server --storage-dir ~/my-notebooks
 
-```typescript
-import { startMCPServer } from '@srcbook/mcp-server';
-
-const server = await startMCPServer({
-  port: 3001,
-  logLevel: 'info',
-  srcbooksDir: './notebooks'
-});
+# Show help
+peragus-mcp-server --help
 ```
 
 ### MCP Client Configuration
 
-Add to your MCP client configuration:
+To connect an MCP client to this server, you have several deployment options:
 
+#### Option 1: Local Development (Requires Peragus Dev Server)
+
+First, start the Peragus development server:
+```bash
+cd /path/to/peragus-app
+pnpm dev
+```
+
+Then configure your MCP client:
+
+**Claude Code Configuration** (`mcp_config_claude_code.json`):
 ```json
 {
   "mcpServers": {
     "peragus-notebooks": {
-      "url": "http://localhost:3001/mcp",
-      "env": {
-        "SRCBOOKS_DIR": "/path/to/your/notebooks"
-      }
+      "command": "node",
+      "args": ["/path/to/peragus-app/packages/mcp-server/dist/cli.mjs", "--log-level", "info"],
+      "env": {}
     }
   }
 }
 ```
 
+#### Option 2: Docker Deployment (Recommended for Production)
+
+**Option 2A: Docker Compose (Easiest)**
+```bash
+# In the peragus-app directory
+docker-compose up -d
+```
+
+**Option 2B: Manual Docker**
+```bash
+# Build and run manually
+docker build -t peragus-app .
+docker run -d \
+  --name peragus \
+  -p 5173:5173 \
+  -p 2150:2150 \
+  -v ~/.srcbook:/root/.srcbook \
+  -v ~/.peragus:/root/.peragus \
+  peragus-app
+```
+
+**Claude Code Configuration** for Docker:
+```json
+{
+  "mcpServers": {
+    "peragus-notebooks": {
+      "command": "docker",
+      "args": ["exec", "peragus", "node", "/app/packages/mcp-server/dist/cli.mjs"],
+      "env": {}
+    }
+  }
+}
+```
+
+After starting Docker, you can:
+- Access Peragus Web UI: http://localhost:5173
+- API runs on: http://localhost:2150
+- MCP server available via: `docker exec peragus node /app/packages/mcp-server/dist/cli.mjs`
+
+#### Option 3: Direct Binary (If Published)
+
+```json
+{
+  "mcpServers": {
+    "peragus-notebooks": {
+      "command": "peragus-mcp-server",
+      "args": ["--log-level", "info"],
+      "env": {}
+    }
+  }
+}
+```
+
+#### Generic MCP Client Configuration
+
+For other MCP clients, use these connection details:
+
+- **Transport**: stdio
+- **Command**: See options above
+- **Protocol Version**: `2025-03-26`
+
 ## Configuration
 
-### Environment Variables
+### Command Line Options
 
-- `SRCBOOKS_DIR` - Directory for storing notebooks (default: `~/.srcbook`)
-- `LOG_LEVEL` - Logging level: `debug`, `info`, `warn`, `error` (default: `info`)
-- `MCP_PORT` - Port for HTTP server (default: `3001`)
+- `-l, --log-level <LEVEL>` - Log level: debug, info, warn, error (default: info)
+- `-d, --storage-dir <DIR>` - Custom storage directory path
+- `-h, --help` - Show help message
+- `-v, --version` - Show version information
 
 ### Configuration Schema
 
 ```typescript
 interface MCPServerConfig {
-  port: number;
   logLevel: 'debug' | 'info' | 'warn' | 'error';
-  srcbooksDir?: string;
+  storageDir?: string;
 }
 ```
 
-## API Reference
+## Available Tools
 
-### Tools
+The server provides the following MCP tools:
 
-#### create_notebook
-Creates a new TypeScript notebook.
-
-**Parameters:**
-- `title` (string) - Notebook title
-- `language` (string) - Programming language (`typescript` or `javascript`)
-- `template` (string, optional) - Template ID to use
-
-**Returns:**
-- `notebookId` (string) - ID of created notebook
-- `path` (string) - File system path to notebook
-
-#### execute_cell
-Executes a code cell in a notebook.
+### `create_notebook`
+Create a new TypeScript/JavaScript notebook.
 
 **Parameters:**
-- `notebookId` (string) - Notebook ID
-- `cellId` (string) - Cell ID to execute
+- `title` (string): Notebook title
+- `language` (string): "typescript" or "javascript"
+- `initialCells` (array, optional): Initial cells to add
 
-**Returns:**
-- `output` (object) - Execution results
-- `status` (string) - Execution status
+### `list_notebooks`
+List all available notebooks with metadata.
 
-#### add_cell
-Adds a new cell to a notebook.
+**Returns:** Array of notebook metadata (id, title, language, createdAt, updatedAt)
+
+### `get_notebook`
+Retrieve a notebook by ID.
 
 **Parameters:**
-- `notebookId` (string) - Notebook ID
-- `type` (string) - Cell type (`code`, `markdown`, `title`)
-- `content` (string) - Cell content
-- `position` (number, optional) - Insert position
+- `id` (string): Notebook ID
 
-**Returns:**
-- `cellId` (string) - ID of created cell
+### `edit_notebook`
+Edit a notebook using various operations.
 
-### Resources
+**Parameters:**
+- `id` (string): Notebook ID
+- `operation` (object): Operation to perform
+  - `type`: "add_cell", "edit_cell", "delete_cell", "move_cell", "execute_cell", "execute_all"
+  - Additional parameters based on operation type
 
-#### notebook://list
-Lists all available notebooks with metadata.
+### `delete_notebook`
+Delete a notebook by ID.
 
-**Response:**
+**Parameters:**
+- `id` (string): Notebook ID
+
+### `execute_notebook`
+Execute all cells in a notebook.
+
+**Parameters:**
+- `id` (string): Notebook ID
+
+### `export_notebook`
+Export a notebook to various formats.
+
+**Parameters:**
+- `id` (string): Notebook ID
+- `format` (string): "markdown", "json", "srcbook", or "html"
+
+### `import_notebook`
+Import a notebook from various sources.
+
+**Parameters:**
+- `source` (string): "file", "url", or "text"
+- `data` (string): Source data (file path, URL, or text content)
+- `title` (string, optional): Custom title for imported notebook
+
+## Available Resources
+
+### Notebook Listing
+- **URI**: `notebook://list`
+- **Description**: List of all available notebooks
+
+### Individual Notebooks
+- **URI**: `notebook://notebooks/{id}`
+- **Description**: Content of a specific notebook
+
+## Storage
+
+Notebooks are stored as JSON files in:
+- **Default**: `~/.peragus-mcp/notebooks/`
+- **Custom**: Use `--storage-dir` flag to specify a different location
+
+Each notebook file contains:
 ```json
 {
-  "notebooks": [
-    {
-      "id": "notebook-123",
-      "title": "My Notebook",
-      "language": "typescript",
-      "lastModified": "2024-01-01T00:00:00Z",
-      "cellCount": 5
-    }
-  ]
-}
-```
-
-#### notebook://read/{id}
-Returns the complete content of a specific notebook.
-
-**Response:**
-```json
-{
-  "id": "notebook-123",
-  "title": "My Notebook",
+  "id": "unique-notebook-id",
+  "title": "Notebook Title",
   "language": "typescript",
   "cells": [
     {
-      "id": "cell-1",
-      "type": "title",
-      "text": "My Notebook"
-    },
-    {
-      "id": "cell-2",
+      "id": "cell-id",
       "type": "code",
-      "source": "console.log('Hello, World!');",
-      "filename": "hello.ts"
+      "source": "console.log('Hello, World!');"
     }
-  ]
+  ],
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z"
 }
 ```
+
+## Code Execution
+
+The server executes TypeScript and JavaScript code using Node.js child processes with:
+- **Timeout**: 30 seconds per execution
+- **Security**: Sandboxed execution environment
+- **Output Capture**: Both stdout and stderr are captured
+- **Error Handling**: Compilation and runtime errors are properly reported
+
+## Protocol Support
+
+- **MCP Protocol Version**: 2025-03-26
+- **Transport**: stdio (standard input/output)
+- **Capabilities**:
+  - Resources with subscription support
+  - Tools with change notifications
+  - Logging with configurable levels
 
 ## Development
 
@@ -186,98 +300,21 @@ pnpm build
 ### Testing
 
 ```bash
-pnpm test
+# Test MCP protocol communication
+echo '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}},"id":1}' | node dist/cli.mjs
+
+# Test tool listing
+echo '{"jsonrpc":"2.0","method":"tools/list","params":{},"id":2}' | node dist/cli.mjs
 ```
 
-### Linting
+### Error Handling
 
-```bash
-pnpm lint
-```
-
-### Type Checking
-
-```bash
-pnpm type-check
-```
-
-## Architecture
-
-The MCP server is built with:
-
-- **@modelcontextprotocol/sdk** - MCP protocol implementation
-- **@srcbook/api** - Core notebook functionality
-- **@srcbook/shared** - Shared types and utilities
-- **zod** - Runtime type validation
-- **express** - HTTP server framework
-
-The server uses streamable HTTP transport for bidirectional communication, supporting real-time interactions between MCP clients and the notebook server.
-
-### Project Structure
-
-```
-src/
-├── index.mts          # Main entry point
-├── server.mts         # MCP server setup
-├── tools.mts          # Tool implementations
-├── resources.mts      # Resource implementations
-├── types.mts          # Type definitions
-├── logger.mts         # Logging utilities
-├── templates.mts      # Notebook templates
-└── test/              # Test files
-```
-
-## Error Handling
-
-The server provides comprehensive error handling with specific error types:
-
-- `NotebookNotFoundError` - Notebook doesn't exist
-- `CellNotFoundError` - Cell doesn't exist
-- `ExecutionError` - Code execution failed
-- `ValidationError` - Invalid input parameters
-- `MCPServerError` - General server errors
-
-## Security
-
-- All inputs are validated using Zod schemas
-- File system access is restricted to configured directories
-- Code execution is sandboxed using existing Peragus security measures
-- No sensitive information is logged
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Server won't start**
-   - Check that all dependencies are installed
-   - Verify the srcbooks directory exists and is writable
-   - Check log output for specific errors
-
-2. **Tools not working**
-   - Ensure notebooks directory is accessible
-   - Check that TypeScript server is running
-   - Verify MCP client configuration
-
-3. **Performance issues**
-   - Monitor memory usage during code execution
-   - Check for long-running processes
-   - Consider adjusting log levels
-
-### Debug Mode
-
-Enable debug logging:
-
-```bash
-LOG_LEVEL=debug pnpm start
-```
-
-## Contributing
-
-1. Follow existing code patterns and conventions
-2. Add tests for new functionality
-3. Update documentation for API changes
-4. Ensure all tests pass before submitting
+The server includes comprehensive error handling:
+- Invalid notebook IDs return `NotebookNotFoundError`
+- Invalid operations return `InvalidOperationError`
+- Code execution failures return `ExecutionError`
+- All errors follow MCP error response format
 
 ## License
 
-This project is licensed under the same terms as the main Peragus project.
+MIT License - see the main project LICENSE file for details.

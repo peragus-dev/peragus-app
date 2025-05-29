@@ -1,15 +1,21 @@
 version: '3'
 services:
-  srcbook:
+  peragus:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '${HOST_BIND:-127.0.0.1}:2150:2150'
+      - '${HOST_BIND:-127.0.0.1}:5173:5173'  # Web UI
+      - '${HOST_BIND:-127.0.0.1}:2150:2150'  # API
     volumes:
       - type: bind
         source: ~/.srcbook
         target: /root/.srcbook
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ~/.peragus
+        target: /root/.peragus
         bind:
           create_host_path: true
     environment:

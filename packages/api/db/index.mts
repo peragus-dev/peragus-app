@@ -8,7 +8,8 @@ import fs from 'node:fs';
 
 // We can't use a relative directory for drizzle since this application
 // can get run from anywhere, so use DIST_DIR as ground truth.
-const drizzleFolder = path.join(DIST_DIR, 'drizzle');
+// DIST_DIR is packages/api/dist/api/, so go up one level to get to dist/drizzle
+const drizzleFolder = path.join(DIST_DIR, '..', 'drizzle');
 
 const DB_PATH = `${HOME_DIR}/.srcbook/srcbook.db`;
 

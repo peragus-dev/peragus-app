@@ -8,7 +8,8 @@
 export { createMCPServer, startMCPServer, shutdownMCPServer } from './server.mjs';
 export { registerResourceHandlers } from './resources.mjs';
 export { registerToolHandlers } from './tools.mjs';
-export { getNotebookTemplates, getNotebookTemplate, createNotebookFromTemplate, type NotebookTemplate } from './templates.mjs';
+export { notebookStorage, type NotebookFile } from './storage.mjs';
+export { codeExecutor, type NotebookExecutionResult } from './execution.mjs';
 export { logger, createLogger, type Logger } from './logger.mjs';
 export {
   MCPServerConfig,
@@ -33,7 +34,6 @@ export {
  * Default configuration for the MCP server
  */
 export const DEFAULT_CONFIG = {
-  port: 3001,
   logLevel: 'info' as const,
 };
 

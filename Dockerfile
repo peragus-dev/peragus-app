@@ -16,9 +16,10 @@ RUN pnpm install
 RUN pnpm build
 
 # Create necessary directories for volumes
-RUN mkdir -p /root/.srcbook /root/.npm
+RUN mkdir -p /root/.srcbook /root/.peragus /root/.npm
 
 # Source code will be mounted at runtime
 CMD [ "pnpm", "start" ]
 
-EXPOSE 2150
+# Expose web app, API, and note that MCP is available via stdio
+EXPOSE 5173 2150

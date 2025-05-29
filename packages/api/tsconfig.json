@@ -11,6 +11,6 @@
       "@peragus/shared/*": ["../shared/src/*"]
     }
   },
-  "include": ["**/*.mts"],
+  "include": ["./**/*.mts"],
   "exclude": ["node_modules", "dist"]
 }

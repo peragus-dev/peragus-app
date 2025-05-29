@@ -10,7 +10,6 @@ import { logger, createLogger } from './logger.mjs';
 function parseArgs(): MCPServerConfig {
   const args = process.argv.slice(2);
   const config: MCPServerConfig = {
-    port: 3001,
     logLevel: 'info'
   };
 
@@ -18,16 +17,6 @@ function parseArgs(): MCPServerConfig {
     const arg = args[i];
     
     switch (arg) {
-      case '--port':
-      case '-p':
-        const port = parseInt(args[++i], 10);
-        if (isNaN(port) || port < 1 || port > 65535) {
-          console.error(`Invalid port: ${args[i]}. Must be between 1 and 65535.`);
-          process.exit(1);
-        }
-        config.port = port;
-        break;
-        
       case '--log-level':
       case '-l':
         const logLevel = args[++i];
@@ -39,9 +28,9 @@ function parseArgs(): MCPServerConfig {
         }
         break;
         
-      case '--srcbooks-dir':
+      case '--storage-dir':
       case '-d':
-        config.srcbooksDir = args[++i];
+        config.storageDir = args[++i];
         break;
         
       case '--help':
@@ -77,33 +66,28 @@ USAGE:
   peragus-mcp-server [OPTIONS]
 
 OPTIONS:
-  -p, --port <PORT>          Server port (default: 3001)
   -l, --log-level <LEVEL>    Log level: debug, info, warn, error (default: info)
-  -d, --srcbooks-dir <DIR>   Custom srcbooks directory path
+  -d, --storage-dir <DIR>    Custom storage directory path
   -h, --help                 Show this help message
   -v, --version              Show version information
 
 EXAMPLES:
-  # Start server on default port
+  # Start server with default settings
   peragus-mcp-server
-
-  # Start server on custom port
-  peragus-mcp-server --port 3002
 
   # Enable debug logging
   peragus-mcp-server --log-level debug
 
-  # Use custom srcbooks directory
-  peragus-mcp-server --srcbooks-dir ~/my-notebooks
+  # Use custom storage directory
+  peragus-mcp-server --storage-dir ~/my-notebooks
 
 DESCRIPTION:
   The Peragus MCP Server exposes TypeScript notebook functionality through the
-  Model Context Protocol (MCP) using streamable HTTP transport. It provides tools
-  for creating, editing, and executing TypeScript/JavaScript notebooks, as well
-  as resources for accessing example notebooks and templates.
+  Model Context Protocol (MCP) using stdio transport. It provides tools for
+  creating, editing, and executing TypeScript/JavaScript notebooks with
+  file-based storage.
 
-  The server uses streamable HTTP transport for communication, supporting
-  real-time bidirectional communication suitable for web clients and MCP clients.
+  Storage location: ~/.peragus-mcp/notebooks/
 `);
 }
 
@@ -147,9 +131,8 @@ async function main(): Promise<void> {
     process.on('SIGINT', () => shutdown('SIGINT'));
     process.on('SIGTERM', () => shutdown('SIGTERM'));
     
-    logger.info(`MCP Server ready on port ${config.port} (streamable HTTP transport)`);
-    // Keep process alive
-    process.stdin.resume();
+    logger.info('MCP Server ready (stdio transport)');
+    // Server will keep process alive via stdio transport
     
   } catch (error) {
     console.error('Failed to start MCP server:', error);
@@ -170,9 +153,8 @@ process.on('uncaughtException', (error) => {
 });
 
 // Start the server
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((error) => {
-    console.error('Fatal error:', error);
-    process.exit(1);
-  });
-}
+// Always start when running directly or through vite-node
+main().catch((error) => {
+  console.error('Fatal error:', error);
+  process.exit(1);
+});
