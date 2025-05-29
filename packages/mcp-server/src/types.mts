@@ -84,6 +84,7 @@ export const TOOL_NAMES = {
   EDIT_NOTEBOOK: 'edit_notebook',
   EXECUTE_NOTEBOOK: 'execute_notebook',
   LIST_NOTEBOOKS: 'list_notebooks',
+  LIST_EXAMPLE_NOTEBOOKS: 'list_example_notebooks',
   GET_NOTEBOOK_CONTENT: 'get_notebook_content',
   SAVE_NOTEBOOK: 'save_notebook',
   DELETE_NOTEBOOK: 'delete_notebook',

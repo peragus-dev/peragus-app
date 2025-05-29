@@ -3,6 +3,10 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 
 import { logger } from './logger.mjs';
 import { notebookStorage } from './storage.mjs';
@@ -11,6 +15,10 @@ import {
   NotebookNotFoundError,
   MCPServerError 
 } from './types.mjs';
+
+// Get the directory of this file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Register all resource handlers with the MCP server
@@ -37,16 +45,17 @@ export function registerResourceHandlers(server: Server): void {
       }
 
       // Add example notebooks as resources
-      const examples = getExampleNotebooks();
+      const examples = await getExampleNotebooks();
       for (const example of examples) {
         resources.push({
           uri: `${RESOURCE_URI_PATTERNS.NOTEBOOK_EXAMPLES}${example.id}`,
           name: example.title,
-          description: example.description || `Example ${example.language} notebook`,
-          mimeType: 'application/json',
+          description: example.description,
+          mimeType: 'text/markdown',
           annotations: {
-            audience: ['user', 'assistant'],
+            audience: ['assistant'],
             priority: 2,
+            tags: example.tags,
           },
         });
       }
@@ -80,18 +89,13 @@ export function registerResourceHandlers(server: Server): void {
       } 
       else if (uri.startsWith(RESOURCE_URI_PATTERNS.NOTEBOOK_EXAMPLES)) {
         const notebookId = extractIdFromURI(uri);
-        const examples = getExampleNotebooks();
-        const example = examples.find(ex => ex.id === notebookId);
-        
-        if (!example) {
-          throw new NotebookNotFoundError(notebookId);
-        }
+        const content = await readExampleNotebook(notebookId);
         
         return {
           contents: [{
             uri,
-            mimeType: 'application/json',
-            text: JSON.stringify(example, null, 2),
+            mimeType: 'text/markdown',
+            text: content,
           }],
         };
       }
@@ -109,75 +113,146 @@ export function registerResourceHandlers(server: Server): void {
 }
 
 /**
- * Get example notebooks (static examples for demonstration)
+ * Example notebook metadata
  */
-function getExampleNotebooks() {
-  return [
-    {
-      id: 'getting-started-ts',
-      title: 'Getting Started with TypeScript',
-      description: 'Learn the basics of TypeScript in notebooks',
-      language: 'typescript' as const,
-      cells: [
-        {
-          id: 'cell_title',
-          type: 'title' as const,
-          content: 'Getting Started with TypeScript'
-        },
-        {
-          id: 'cell_intro',
-          type: 'markdown' as const,
-          content: '# Welcome to TypeScript Notebooks!\n\nThis is an interactive TypeScript environment where you can write and execute code.'
-        },
-        {
-          id: 'cell_hello',
-          type: 'code' as const,
-          content: 'console.log("Hello, TypeScript!");\nconst message: string = "Welcome to Peragus!";\nconsole.log(message);',
-          filename: 'hello.ts'
-        },
-        {
-          id: 'cell_types',
-          type: 'code' as const,
-          content: '// TypeScript types in action\ninterface User {\n  name: string;\n  age: number;\n}\n\nconst user: User = {\n  name: "Alice",\n  age: 30\n};\n\nconsole.log(`User: ${user.name}, Age: ${user.age}`);',
-          filename: 'types.ts'
-        }
-      ],
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z'
-    },
-    {
-      id: 'getting-started-js',
-      title: 'Getting Started with JavaScript',
-      description: 'Learn the basics of JavaScript in notebooks',
-      language: 'javascript' as const,
-      cells: [
-        {
-          id: 'cell_title',
-          type: 'title' as const,
-          content: 'Getting Started with JavaScript'
-        },
-        {
-          id: 'cell_intro',
-          type: 'markdown' as const,
-          content: '# Welcome to JavaScript Notebooks!\n\nThis is an interactive JavaScript environment.'
-        },
-        {
-          id: 'cell_hello',
-          type: 'code' as const,
-          content: 'console.log("Hello, JavaScript!");\nconst message = "Welcome to Peragus!";\nconsole.log(message);',
-          filename: 'hello.js'
-        },
-        {
-          id: 'cell_functions',
-          type: 'code' as const,
-          content: '// JavaScript functions\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n\nconst greeting = greet("World");\nconsole.log(greeting);',
-          filename: 'functions.js'
-        }
-      ],
-      createdAt: '2024-01-01T00:00:00.000Z',
-      updatedAt: '2024-01-01T00:00:00.000Z'
+const EXAMPLE_NOTEBOOKS_METADATA: Record<string, {
+  title: string;
+  description: string;
+  tags: string[];
+}> = {
+  'connecting-to-postgres': {
+    title: 'Connecting to Postgres',
+    description: 'Demonstrates database connection, queries, and data manipulation with PostgreSQL',
+    tags: ['Database', 'PostgreSQL', 'SQL']
+  },
+  'contributions-from-github-api': {
+    title: 'Contributions from GitHub API',
+    description: 'Shows how to use the GitHub API to fetch contributor statistics',
+    tags: ['API', 'GitHub', 'Data']
+  },
+  'diagramming-srcbook-architecture': {
+    title: 'Diagramming Srcbook Architecture',
+    description: 'Shows how to create architecture diagrams using Mermaid',
+    tags: ['Visualization', 'Mermaid', 'Architecture']
+  },
+  'generating-random-ids': {
+    title: 'Generating Random IDs',
+    description: 'Different methods for generating secure random identifiers',
+    tags: ['Security', 'Cryptography', 'Utilities']
+  },
+  'getting-started': {
+    title: 'Getting Started',
+    description: 'Quick tutorial to explore the basic concepts in Srcbooks',
+    tags: ['Srcbook', 'Learn', 'Tutorial']
+  },
+  'hn-screenshots': {
+    title: 'HN Screenshots',
+    description: 'Demonstrates taking and manipulating screenshots from Hacker News',
+    tags: ['Web Scraping', 'Screenshots', 'Puppeteer']
+  },
+  'langgraph-web-agent': {
+    title: 'LangGraph Web Agent',
+    description: 'Learn to write a stateful agent with memory using LangGraph and Tavily',
+    tags: ['AI', 'LangGraph', 'Agents']
+  },
+  'openai-structured-outputs': {
+    title: 'OpenAI Structured Outputs',
+    description: 'How to work with structured outputs from OpenAI models',
+    tags: ['AI', 'OpenAI', 'Structured Data']
+  },
+  'parea-ai-evals-101': {
+    title: 'Parea AI Evals 101',
+    description: 'Introduction to evaluating AI models using Parea',
+    tags: ['AI', 'Evaluation', 'Testing']
+  },
+  'pinata-sdk-101': {
+    title: 'Pinata SDK 101',
+    description: 'Introduction to using the Pinata SDK for IPFS interactions',
+    tags: ['IPFS', 'Storage', 'Web3']
+  },
+  'port-check': {
+    title: 'Port Check',
+    description: 'Utility to check if specific ports are open on a server',
+    tags: ['Networking', 'Utilities', 'System']
+  },
+  'read-write-aws-s3': {
+    title: 'Read/Write AWS S3',
+    description: 'Examples of reading from and writing to AWS S3 buckets',
+    tags: ['AWS', 'S3', 'Storage']
+  },
+  'shamir-secret-sharing': {
+    title: 'Shamir Secret Sharing',
+    description: 'Implementation of Shamir\'s Secret Sharing scheme for secure key distribution',
+    tags: ['Security', 'Cryptography', 'Algorithms']
+  },
+  'traceloop-101': {
+    title: 'Traceloop 101',
+    description: 'Getting started with Traceloop for LLM observability',
+    tags: ['AI', 'Observability', 'Monitoring']
+  },
+  'web-scraping-with-puppeteer': {
+    title: 'Web Scraping with Puppeteer',
+    description: 'Tutorial on web scraping using Puppeteer',
+    tags: ['Web Scraping', 'Puppeteer', 'Automation']
+  },
+  'websockets': {
+    title: 'WebSockets',
+    description: 'Learn to build a simple WebSocket client and server in Node.js',
+    tags: ['WebSockets', 'Real-time', 'Networking']
+  }
+};
+
+/**
+ * Get example notebooks from the file system
+ */
+async function getExampleNotebooks() {
+  const examplesDir = join(__dirname, '../../api/srcbook/examples');
+  const notebooks = [];
+  
+  try {
+    const { readdirSync } = await import('node:fs');
+    const files = readdirSync(examplesDir);
+    
+    for (const file of files) {
+      if (file.endsWith('.src.md') && !file.startsWith('README')) {
+        const id = file.replace('.src.md', '');
+        const metadata = EXAMPLE_NOTEBOOKS_METADATA[id] || {
+          title: id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          description: `Example notebook: ${id}`,
+          tags: ['Example']
+        };
+        
+        notebooks.push({
+          id,
+          title: metadata.title,
+          description: metadata.description,
+          tags: metadata.tags,
+          filename: file,
+          language: 'typescript' // Most examples are TypeScript
+        });
+      }
     }
-  ];
+  } catch (error) {
+    logger.error('Error reading example notebooks:', error);
+  }
+  
+  return notebooks;
+}
+
+/**
+ * Read example notebook content
+ */
+async function readExampleNotebook(id: string): Promise<string> {
+  const examplesDir = join(__dirname, '../../api/srcbook/examples');
+  const filePath = join(examplesDir, `${id}.src.md`);
+  
+  try {
+    const content = await readFile(filePath, 'utf-8');
+    return content;
+  } catch (error) {
+    logger.error(`Error reading example notebook ${id}:`, error);
+    throw new NotebookNotFoundError(id);
+  }
 }
 
 /**

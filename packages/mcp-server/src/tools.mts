@@ -12,6 +12,8 @@ import { pathToSrcbook } from '@peragus/api/srcbook/path.mjs';
 import { decode } from '@peragus/api/srcmd.mjs';
 import fs from 'node:fs';
 import { randomid } from '@peragus/shared';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { 
   TOOL_NAMES,
   ToolResult,
@@ -149,6 +151,15 @@ export function registerToolHandlers(server: Server): void {
           },
           required: ['notebookId', 'confirm']
         }
+      },
+      {
+        name: TOOL_NAMES.LIST_EXAMPLE_NOTEBOOKS,
+        description: 'List all available example notebooks from Peragus that can be used as reference when creating new notebooks',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
       }
     ];
 
@@ -184,6 +195,9 @@ export function registerToolHandlers(server: Server): void {
           break;
         case 'delete_notebook':
           result = await handleDeleteNotebook(args);
+          break;
+        case TOOL_NAMES.LIST_EXAMPLE_NOTEBOOKS:
+          result = await handleListExampleNotebooks();
           break;
         default:
           throw new MCPServerError(`Unknown tool: ${toolName}`, 'UNKNOWN_TOOL');
@@ -555,6 +569,123 @@ async function handleDeleteNotebook(args: any): Promise<ToolResult> {
     throw new MCPServerError(
       `Failed to delete notebook: ${error instanceof Error ? error.message : 'Unknown error'}`,
       'DELETE_NOTEBOOK_ERROR',
+      error
+    );
+  }
+}
+
+/**
+ * Handle list example notebooks tool
+ */
+async function handleListExampleNotebooks(): Promise<ToolResult> {
+  try {
+    const examplesDir = join(dirname(fileURLToPath(import.meta.url)), '../../api/srcbook/examples');
+    const { readdirSync } = await import('node:fs');
+    
+    const notebooks = [];
+    const files = readdirSync(examplesDir);
+    
+    // Define metadata for example notebooks
+    const metadata: Record<string, { description: string; tags: string[] }> = {
+      'connecting-to-postgres': {
+        description: 'Demonstrates database connection, queries, and data manipulation with PostgreSQL',
+        tags: ['Database', 'PostgreSQL', 'SQL']
+      },
+      'contributions-from-github-api': {
+        description: 'Shows how to use the GitHub API to fetch contributor statistics',
+        tags: ['API', 'GitHub', 'Data']
+      },
+      'diagramming-srcbook-architecture': {
+        description: 'Shows how to create architecture diagrams using Mermaid',
+        tags: ['Visualization', 'Mermaid', 'Architecture']
+      },
+      'generating-random-ids': {
+        description: 'Different methods for generating secure random identifiers',
+        tags: ['Security', 'Cryptography', 'Utilities']
+      },
+      'getting-started': {
+        description: 'Quick tutorial to explore the basic concepts in Srcbooks',
+        tags: ['Srcbook', 'Learn', 'Tutorial']
+      },
+      'hn-screenshots': {
+        description: 'Demonstrates taking and manipulating screenshots from Hacker News',
+        tags: ['Web Scraping', 'Screenshots', 'Puppeteer']
+      },
+      'langgraph-web-agent': {
+        description: 'Learn to write a stateful agent with memory using LangGraph and Tavily',
+        tags: ['AI', 'LangGraph', 'Agents']
+      },
+      'openai-structured-outputs': {
+        description: 'How to work with structured outputs from OpenAI models',
+        tags: ['AI', 'OpenAI', 'Structured Data']
+      },
+      'parea-ai-evals-101': {
+        description: 'Introduction to evaluating AI models using Parea',
+        tags: ['AI', 'Evaluation', 'Testing']
+      },
+      'pinata-sdk-101': {
+        description: 'Introduction to using the Pinata SDK for IPFS interactions',
+        tags: ['IPFS', 'Storage', 'Web3']
+      },
+      'port-check': {
+        description: 'Utility to check if specific ports are open on a server',
+        tags: ['Networking', 'Utilities', 'System']
+      },
+      'read-write-aws-s3': {
+        description: 'Examples of reading from and writing to AWS S3 buckets',
+        tags: ['AWS', 'S3', 'Storage']
+      },
+      'shamir-secret-sharing': {
+        description: 'Implementation of Shamir\'s Secret Sharing scheme for secure key distribution',
+        tags: ['Security', 'Cryptography', 'Algorithms']
+      },
+      'traceloop-101': {
+        description: 'Getting started with Traceloop for LLM observability',
+        tags: ['AI', 'Observability', 'Monitoring']
+      },
+      'web-scraping-with-puppeteer': {
+        description: 'Tutorial on web scraping using Puppeteer',
+        tags: ['Web Scraping', 'Puppeteer', 'Automation']
+      },
+      'websockets': {
+        description: 'Learn to build a simple WebSocket client and server in Node.js',
+        tags: ['WebSockets', 'Real-time', 'Networking']
+      }
+    };
+    
+    for (const file of files) {
+      if (file.endsWith('.src.md') && !file.startsWith('README')) {
+        const id = file.replace('.src.md', '');
+        const info = metadata[id] || {
+          description: `Example notebook: ${id}`,
+          tags: ['Example']
+        };
+        
+        notebooks.push({
+          id,
+          filename: file,
+          title: id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          description: info.description,
+          tags: info.tags,
+          resourceUri: `notebook://examples/${id}`,
+          importCommand: `Use the import_notebook tool with source='url' and content='notebook://examples/${id}' to import this example`
+        });
+      }
+    }
+    
+    return {
+      success: true,
+      data: {
+        count: notebooks.length,
+        examples: notebooks,
+        note: 'These example notebooks can be imported using the import_notebook tool or accessed as MCP resources'
+      },
+      message: `Found ${notebooks.length} example notebooks`
+    };
+  } catch (error) {
+    throw new MCPServerError(
+      `Failed to list example notebooks: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'LIST_EXAMPLES_ERROR',
       error
     );
   }

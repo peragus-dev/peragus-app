@@ -6,6 +6,7 @@ A Model Context Protocol (MCP) server that provides TypeScript notebook function
 
 - **CRUD Operations**: Create, read, update, and delete TypeScript/JavaScript notebooks
 - **Code Execution**: Execute notebook cells with timeout and error handling
+- **Example Notebooks**: Access 16+ example notebooks as MCP resources for AI reference
 - **File-based Storage**: Stores notebooks as JSON files in `~/.peragus-mcp/notebooks/`
 - **Protocol Version 2025-03-26**: Uses the latest MCP protocol with stdio transport
 - **Standalone Operation**: No database dependencies, runs independently
@@ -195,6 +196,17 @@ Create a new TypeScript/JavaScript notebook.
 List all available notebooks with metadata.
 
 **Returns:** Array of notebook metadata (id, title, language, createdAt, updatedAt)
+
+### `list_example_notebooks`
+List all available example notebooks that can be used as reference when creating new notebooks.
+
+**Returns:** Array of example notebooks with:
+- `id`: Example notebook identifier
+- `title`: Human-readable title
+- `description`: What the example demonstrates
+- `tags`: Categories (e.g., "AI", "Database", "Web Scraping")
+- `resourceUri`: MCP resource URI to access the notebook
+- `importCommand`: Instructions to import the example
 
 ### `get_notebook`
 Retrieve a notebook by ID.
