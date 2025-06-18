@@ -6,6 +6,8 @@ import { z } from 'zod';
 export const MCPServerConfigSchema = z.object({
   logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   storageDir: z.string().optional(),
+  transport: z.enum(['stdio', 'http']).default('stdio'),
+  port: z.number().default(3001),
 });
 
 export type MCPServerConfig = z.infer<typeof MCPServerConfigSchema>;
