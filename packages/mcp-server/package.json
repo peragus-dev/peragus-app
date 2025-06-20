@@ -27,7 +27,8 @@
     "@modelcontextprotocol/sdk": "^1.12.1",
     "@peragus/api": "workspace:^",
     "@peragus/shared": "workspace:^",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

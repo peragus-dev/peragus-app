@@ -107,9 +107,11 @@ export class TestOrchestratorImpl implements TestOrchestrator {
     };
   }
 
-  async scheduleTest(_scenario: TestScenario, _schedule: CronSchedule): Promise<string> {
+  async scheduleTest(scenario: TestScenario, schedule: CronSchedule): Promise<string> {
+    void scenario;
+    void schedule;
     const scheduleId = this.generateId();
-    
+
     // For now, just return the schedule ID
     // In a real implementation, this would use node-cron
     return scheduleId;

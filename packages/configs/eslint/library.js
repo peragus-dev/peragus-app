@@ -4,7 +4,9 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
-  extends: ['prettier', 'turbo'],
+  extends: ['prettier', 'turbo', 'plugin:@typescript-eslint/recommended'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   globals: {
     React: true,
     JSX: true,

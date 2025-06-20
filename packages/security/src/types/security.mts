@@ -104,6 +104,7 @@ export interface AuthenticatedRequest extends Request {
   token?: JWTPayload;
   sessionID: string;  // Made required
   sessionId?: string; // Keep this for backward compatibility
+  validatedData?: Record<string, unknown>;
 }
 
 export interface SecurityContext {
@@ -150,8 +151,8 @@ export interface SecurityEvent {
   resource: string;
   action: string;
   outcome: 'success' | 'failure' | 'blocked';
-  details: Record<string, any>;
-  metadata?: Record<string, any>;
+  details: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export const SecurityEventType = {

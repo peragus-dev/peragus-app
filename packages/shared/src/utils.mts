@@ -75,7 +75,7 @@ export function getDefaultExtensionForLanguage(language: CodeLanguageType) {
  * @returns An AsyncIterable over the stream contents.
  */
 export function StreamToIterable<T>(stream: ReadableStream<T>): AsyncIterable<T> {
-  // @ts-ignore
+  // @ts-expect-error -- older Node types may not define Symbol.asyncIterator on ReadableStream
   return stream[Symbol.asyncIterator] ? stream[Symbol.asyncIterator]() : createIterable(stream);
 }
 

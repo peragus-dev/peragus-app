@@ -305,18 +305,20 @@ export function createValidationMiddleware(schema: ValidationSchema) {
   return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { body, query, params, headers } = req;
-      let validatedData: Record<string, any> = {};
+      const validatedData: Record<string, unknown> = {};
       const validationErrors: FieldErrorDetail[] = [];
 
       if (schema.body) {
         const result = schema.body.safeParse(body);
         if (!result.success) {
-          const errors: FieldErrorDetail[] = result.error.errors.map((e: z.ZodIssue) => ({
-            field: e.path.join('.'),
-            message: e.message,
-            value: 'input' in e ? (e as any).input : undefined,
-            code: String(e.code)
-          }));
+          const errors: FieldErrorDetail[] = result.error.errors.map(
+            (e: z.ZodIssue & { input?: unknown }) => ({
+              field: e.path.join('.'),
+              message: e.message,
+              value: 'input' in e ? e.input : undefined,
+              code: String(e.code)
+            })
+          );
           validationErrors.push(...errors);
         } else {
           validatedData.body = result.data;
@@ -326,12 +328,14 @@ export function createValidationMiddleware(schema: ValidationSchema) {
       if (schema.query) {
         const result = schema.query.safeParse(query);
         if (!result.success) {
-          const errors: FieldErrorDetail[] = result.error.errors.map((e: z.ZodIssue) => ({
-            field: e.path.join('.'),
-            message: e.message,
-            value: 'input' in e ? (e as any).input : undefined,
-            code: String(e.code)
-          }));
+          const errors: FieldErrorDetail[] = result.error.errors.map(
+            (e: z.ZodIssue & { input?: unknown }) => ({
+              field: e.path.join('.'),
+              message: e.message,
+              value: 'input' in e ? e.input : undefined,
+              code: String(e.code)
+            })
+          );
           validationErrors.push(...errors);
         } else {
           validatedData.query = result.data;
@@ -341,12 +345,14 @@ export function createValidationMiddleware(schema: ValidationSchema) {
       if (schema.params) {
         const result = schema.params.safeParse(params);
         if (!result.success) {
-          const errors: FieldErrorDetail[] = result.error.errors.map((e: z.ZodIssue) => ({
-            field: e.path.join('.'),
-            message: e.message,
-            value: 'input' in e ? (e as any).input : undefined,
-            code: String(e.code)
-          }));
+          const errors: FieldErrorDetail[] = result.error.errors.map(
+            (e: z.ZodIssue & { input?: unknown }) => ({
+              field: e.path.join('.'),
+              message: e.message,
+              value: 'input' in e ? e.input : undefined,
+              code: String(e.code)
+            })
+          );
           validationErrors.push(...errors);
         } else {
           validatedData.params = result.data;
@@ -356,12 +362,14 @@ export function createValidationMiddleware(schema: ValidationSchema) {
       if (schema.headers) {
         const result = schema.headers.safeParse(headers);
         if (!result.success) {
-          const errors: FieldErrorDetail[] = result.error.errors.map((e: z.ZodIssue) => ({
-            field: e.path.join('.'),
-            message: e.message,
-            value: 'input' in e ? (e as any).input : undefined,
-            code: String(e.code)
-          }));
+          const errors: FieldErrorDetail[] = result.error.errors.map(
+            (e: z.ZodIssue & { input?: unknown }) => ({
+              field: e.path.join('.'),
+              message: e.message,
+              value: 'input' in e ? e.input : undefined,
+              code: String(e.code)
+            })
+          );
           validationErrors.push(...errors);
         } else {
           // Be careful with mutating req.headers, usually not recommended
@@ -390,7 +398,7 @@ export function createValidationMiddleware(schema: ValidationSchema) {
       }
 
       // Attach validated data to request for downstream handlers
-      (req as any).validatedData = validatedData;
+      req.validatedData = validatedData;
 
       next();
     } catch (error) {

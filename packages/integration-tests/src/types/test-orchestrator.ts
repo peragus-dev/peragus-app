@@ -71,15 +71,15 @@ export interface StepResult {
   step: string;
   success: boolean;
   duration: number;
-  result?: any;
+  result?: unknown;
   error?: string;
 }
 
 export interface AssertionResult {
   assertion: string;
   success: boolean;
-  expected: any;
-  actual: any;
+  expected: unknown;
+  actual: unknown;
   message?: string;
 }
 
@@ -87,7 +87,7 @@ export interface LogEntry {
   timestamp: Date;
   level: LogLevel;
   message: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export enum LogLevel {

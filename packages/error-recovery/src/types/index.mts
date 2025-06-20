@@ -74,7 +74,7 @@ export interface HealthCheckResult {
   timestamp: Date;
   responseTime: number;
   details: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ServiceHealth {
@@ -157,7 +157,7 @@ export interface DegradationConfig {
   /** Features to disable at this level */
   disabledFeatures: string[];
   /** Fallback implementations */
-  fallbacks: Record<string, () => Promise<any>>;
+  fallbacks: Record<string, () => Promise<unknown>>;
   /** Cache settings for degraded mode */
   cacheSettings: {
     enabled: boolean;
@@ -217,7 +217,7 @@ export interface RecoveryResult {
   action: string;
   duration: number;
   error?: Error;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RecoveryPlan {
@@ -294,7 +294,7 @@ export const RetryConfigSchema = z.object({
 export const DegradationConfigSchema = z.object({
   level: z.nativeEnum(DegradationLevel).default(DegradationLevel.NONE),
   disabledFeatures: z.array(z.string()).default([]),
-  fallbacks: z.record(z.any()).default({}),
+  fallbacks: z.record(z.unknown()).default({}),
   cacheSettings: z.object({
     enabled: z.boolean().default(true),
     ttl: z.number().min(1000).max(3600000).default(300000),
@@ -317,7 +317,7 @@ export interface ErrorRecoveryEvent {
         'degradation_deactivated' | 'recovery_plan_executed' | 'service_recovered';
   serviceId: string;
   timestamp: Date;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 

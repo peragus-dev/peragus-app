@@ -3,7 +3,7 @@ module.exports = {
   extends: [require.resolve('@peragus/configs/eslint/library.js')],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: './tsconfig.lint.json',
+    project: './tsconfig.json',
     tsconfigRootDir: __dirname,
   },
   globals: {
