@@ -23,7 +23,7 @@ export interface TestStep {
   description: string;
   timeout: number;
   action: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
 }
 
 /**

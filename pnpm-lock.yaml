@@ -412,6 +412,9 @@ importers:
       '@peragus/shared':
         specifier: workspace:^
         version: link:../shared
+      express:
+        specifier: ^4.18.2
+        version: 4.20.0
       zod:
         specifier: 'catalog:'
         version: 3.23.8

@@ -1,4 +1,4 @@
-export type AppGenerationFeedbackType = {
+export interface AppGenerationFeedbackType {
   planId: string;
-  feedback: any;
-};
+  feedback: unknown;
+}
